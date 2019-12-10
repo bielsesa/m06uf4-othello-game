@@ -9,15 +9,68 @@ let connexiobd = () => {
   });
 };
 
-let inserirJugador = nouJugador => {};
+let registraJugador = nouJugador => {
+  try {
+    mongoClient.connect(url, (err, db) => {
+      if (err) throw err;
+  
+      db.db('othello')
+        .collection('jugadors')
+        .insertOne({ nom: nouJugador.nom, email: nouJugador.email, contrasenya: nouJugador.contrasenya });
+  
+      db.close();
+    });
+  } catch(error) {
+    console.log(`Hi ha hagut un error a l'hora d'inserir el jugador a la base de dades.
+      Error: ${error}`);
+  }
+};
 
-let inserirPuntuacio = (jugador, punts) => {};
+/****** Insereix una puntuació ******/
+let inserirPuntuacio = (jugador, puntsJugador) => {
+  try {
+    mongoClient.connect(url, (err, db) => {
+      if (err) throw err;
+  
+      db.db('othello')
+        .collection('jugadors')
+        .insertOne({ punts: puntsJugador, nom: jugador.nom });
+  
+      db.close();
+    });
+  } catch(error) {
+    console.log(`Hi ha hagut un error a l'hora d'inserir la puntuació a la base de dades.
+      Error: ${error}`);
+  }
+};
 
 let actualitzaJugador = jugador => {};
 
 let actualitzaPuntuacio = (jugador, punts) => {};
 
-let trobaJugador = jugador => {};
+/****** Comprova si el nom d'usuari ja existeix ******/
+let nomJugadorExistent = nouNom => {
+  let existeix = false;
+  try {
+    mongoClient.connect(url, (err, db) => {
+      if (err) throw err;
+  
+      db.db('othello')
+        .collection('jugadors')
+        .findOne({ nom: nouNom }, (err, res) => {
+          if (err) throw err;
+          if (res) existeix = true;
+        });
+  
+      db.close();
+    });
+
+    return existeix;
+  } catch(error) {
+    console.log(`Hi ha hagut un error a l'hora de consultar la base de dades.
+      Error: ${error}`);
+  }
+};
 
 let mostraMillorsPuntuacions = num => {
   let puntuacionsResultat;
