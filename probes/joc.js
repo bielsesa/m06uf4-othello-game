@@ -1,27 +1,32 @@
+/**** funcions drag&drop ****/
+function allowDrop (ev) {
+  ev.preventDefault();
+};
+
+function drag (ev) {
+  console.log('DRAG');
+  ev.dataTransfer.setData('fitxa', ev.target.id);
+};
+
+function drop (ev) {
+  console.log('DROP');
+  ev.preventDefault();
+  var data = ev.dataTransfer.getData('fitxa');
+  console.log(`Data: ${data}`);
+  console.log(`Event target: ${ev.target}`);
+  ev.target.appendChild(document.getElementById(data));
+};
+
+
 $().ready(() => {
-  /**** funcions drag&drop ****/
-  let allowDrop = ev => {
-    ev.preventDefault();
-  };
-
-  let drag = ev => {
-    ev.dataTransfer.setData('text', ev.target.id);
-  };
-
-  let drop = ev => {
-    ev.preventDefault();
-    var data = ev.dataTransfer.getData('text');
-    console.log(`Data: ${data}`);
-    console.log(`Event target: ${ev.target}`);
-    ev.target.appendChild(document.getElementById(data));
-  };
-
+  
   let othelloBoard = [];
+  
   for (let r = 72; r >= 65; r--) {
     /**** afegeix la fila ****/
     let row = document.createElement('tr');
     row.id = `row-${String.fromCharCode(r)}`;
-    $('table')[0].after(row);
+    $('table')[0].append(row);
 
     /**** afegeix les columnes a la fila ja inserida ****/
     for (let c = 1; c <= 8; c++) {
@@ -38,8 +43,8 @@ $().ready(() => {
       } else {
         /**** llocs buits inicials ****/
         /**** s'ha de poder fer drop a aquestes columnes ****/
-        col.ondrop = drop;
-        col.ondragover = allowDrop;
+        col.addEventListener('drop', drop);
+        col.addEventListener('dragover', allowDrop);
 
         fitxa.setAttribute('src', '../frontend/img/fitxa-buida.png');
       }
@@ -55,13 +60,15 @@ $().ready(() => {
     let fb = document.createElement('img');
     fb.setAttribute('src', '../frontend/img/fitxa-blanca.png');
     fb.setAttribute('draggable', 'true');
-    fb.ondragstart = drag;
+    console.log(`FITXA BLANCA DRAG: ${fb.getAttribute('draggable')}`);
+    fb.addEventListener('dragstart', drag);
     $('.blanques').append(fb);
 
     let fn = document.createElement('img');
     fn.setAttribute('src', '../frontend/img/fitxa-negra.png');
     fn.setAttribute('draggable', 'true');
-    fn.ondragstart = drag;
+    console.log(`FITXA NEGRA DRAG: ${fn.getAttribute('draggable')}`);
+    fn.addEventListener('dragstart', drag);
     $('.negres').append(fn);
   }
 });
