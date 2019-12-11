@@ -11,6 +11,7 @@ $().ready(() => {
   let drop = ev => {
     ev.preventDefault();
     var data = ev.dataTransfer.getData('text');
+    console.log(`Data: ${data}`);
     console.log(`Event target: ${ev.target}`);
     ev.target.appendChild(document.getElementById(data));
   };
