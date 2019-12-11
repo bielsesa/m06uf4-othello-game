@@ -9,9 +9,10 @@
 td {
     background: #35947E;
     border-bottom: 2px solid rgb(179, 223, 213);
-    color: #35947E;
     text-align: center;
     vertical-align: middle;
+    height: 24px;
+    width: 24px;
 }
 
 td:nth-child(even) {
@@ -35,8 +36,16 @@ td:nth-child(odd) {
 
 .fitxes {
     background: rgb(80, 80, 80);
-    height: 24px;
+    height: 30px;
     width: 800px;
+}
+
+.fila {
+    display: block;
+}
+
+.columna {
+    display: inline-block;
 }
 
 /************** IDENTIFIER SELECTORS **************/

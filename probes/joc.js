@@ -5,15 +5,13 @@ function allowDrop (ev) {
 
 function drag (ev) {
   console.log('DRAG');
-  ev.dataTransfer.setData('fitxa', ev.target.id);
+  ev.dataTransfer.setData('text', ev.target.id);
 };
 
 function drop (ev) {
-  console.log('DROP');
   ev.preventDefault();
-  var data = ev.dataTransfer.getData('fitxa');
-  console.log(`Data: ${data}`);
-  console.log(`Event target: ${ev.target}`);
+  console.log(`${ev.target.tagName}`);
+  var data = ev.dataTransfer.getData('text');
   ev.target.appendChild(document.getElementById(data));
 };
 
@@ -21,6 +19,8 @@ function drop (ev) {
 $().ready(() => {
   
   let othelloBoard = [];
+  let files, columnes = 8;
+  let inici = 65; // LLETRA A
   
   for (let r = 72; r >= 65; r--) {
     /**** afegeix la fila ****/
@@ -46,7 +46,7 @@ $().ready(() => {
         col.addEventListener('drop', drop);
         col.addEventListener('dragover', allowDrop);
 
-        fitxa.setAttribute('src', '../frontend/img/fitxa-buida.png');
+        //fitxa.setAttribute('src', '../frontend/img/fitxa-buida.png');
       }
       col.appendChild(fitxa);
 
@@ -60,14 +60,16 @@ $().ready(() => {
     let fb = document.createElement('img');
     fb.setAttribute('src', '../frontend/img/fitxa-blanca.png');
     fb.setAttribute('draggable', 'true');
-    console.log(`FITXA BLANCA DRAG: ${fb.getAttribute('draggable')}`);
+    fb.id = `b-${i}`;
+    //console.log(`FITXA BLANCA DRAG: ${fb.getAttribute('draggable')}`);
     fb.addEventListener('dragstart', drag);
     $('.blanques').append(fb);
 
     let fn = document.createElement('img');
     fn.setAttribute('src', '../frontend/img/fitxa-negra.png');
     fn.setAttribute('draggable', 'true');
-    console.log(`FITXA NEGRA DRAG: ${fn.getAttribute('draggable')}`);
+    fn.id = `n-${i}`;
+    //console.log(`FITXA NEGRA DRAG: ${fn.getAttribute('draggable')}`);
     fn.addEventListener('dragstart', drag);
     $('.negres').append(fn);
   }
