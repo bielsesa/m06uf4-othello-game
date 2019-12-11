@@ -7,12 +7,7 @@
     <title>Entrar</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <style>
-        form {
-            margin: auto;
-            width: 35%;
-        }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">
     <script src="js/login.js"></script>
 </head>
 
@@ -38,31 +33,39 @@
         </div>
     </nav>
 
-    <form class="text-center border border-light p-5" action="#!">
+    <div class="container">
+        <div class="col"></div>
+        <div class="col-6 container formulari">
+            <form class="text-center border border-light p-5" action="#!">
 
-        <p class="h4 mb-4">Entrar al meu compte</p>
+                <p class="h4 mb-4">Entrar al meu compte</p>
 
-        <div class="form-row mb-4">
-            <div class="col">
-                <!-- User name -->
-                <input type="text" id="defaultRegisterFormFirstName" class="form-control"
-                    placeholder="Username o E-mail">
-            </div>
+                <div class="form-row mb-4">
+                    <div class="col">
+                        <!-- User name -->
+                        <input type="text" id="defaultRegisterFormFirstName" class="form-control"
+                            placeholder="Username o E-mail" required>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <input type="password" id="defaultRegisterFormPassword" class="form-control" placeholder="Contrasenya"
+                    aria-describedby="defaultRegisterFormPasswordHelpBlock" required>
+                <small id="defaultRegisterFormPasswordHelpBlock" class="form-text text-muted mb-4">
+                    T'has oblidat de la contrasenya? <a href="#">Recuperar-la</a>
+                </small>
+
+                <!-- Sign up button -->
+                <button class="btn btn-info my-4 btn-block" type="submit"
+                    style="background-color: #478d49;">Entrar</button>
+
+                <hr>
+            </form>
         </div>
+        <div class="col"></div>
+    </div>
 
-        <!-- Password -->
-        <input type="password" id="defaultRegisterFormPassword" class="form-control" placeholder="Contrasenya"
-            aria-describedby="defaultRegisterFormPasswordHelpBlock">
-        <small id="defaultRegisterFormPasswordHelpBlock" class="form-text text-muted mb-4">
-            T'has oblidat de la contrasenya? <a href="#">Recuperar-la</a>
-        </small>
 
-        <!-- Sign up button -->
-        <button class="btn btn-info my-4 btn-block" type="submit" style="background-color: #478d49;">Entrar</button>
-
-        <hr>
-
-    </form>
 
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
         integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"

@@ -1,0 +1,42 @@
+/************** TAG SELECTORS **************/
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+td {
+    background: #35947E;
+    border-bottom: 2px solid rgb(179, 223, 213);
+    color: #35947E;
+    text-align: center;
+    vertical-align: middle;
+}
+
+td:nth-child(even) {
+    border-left: 2px solid rgb(179, 223, 213);
+}
+
+td:nth-child(odd) {
+    border-left: 2px solid rgb(179, 223, 213);
+}
+
+/************** CLASS SELECTORS **************/
+
+.formulari {
+    min-width: 18.75rem;
+} 
+
+.othello-board {
+    margin: 0;
+    padding: 0;
+}
+
+.fitxes {
+    background: rgb(80, 80, 80);
+    height: 24px;
+    width: 800px;
+}
+
+/************** IDENTIFIER SELECTORS **************/

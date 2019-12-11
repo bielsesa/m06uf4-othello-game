@@ -33,7 +33,7 @@ let inserirPuntuacio = (jugador, puntsJugador) => {
       if (err) throw err;
   
       db.db('othello')
-        .collection('jugadors')
+        .collection('puntuacions')
         .insertOne({ punts: puntsJugador, nom: jugador.nom });
   
       db.close();
