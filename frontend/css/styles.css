@@ -1,24 +1,52 @@
-.formulari {
-    min-width: 18.75rem;
-} 
+/************** TAG SELECTORS **************/
 
-.othello-board {
+* {
     margin: 0;
     padding: 0;
-    border: 20px black solid;
-}
-
-td {
-    background: #35947E;
+    border: 0;
+  }
+  
+  td {
+    background: #35947e;
     border-bottom: 2px solid rgb(179, 223, 213);
-    color: #35947E;
-    width: 26px;
-}
-
-td:nth-child(even) {
+    text-align: center;
+    vertical-align: middle;
+    height: 24px;
+    width: 24px;
+  }
+  
+  td:nth-child(even) {
     border-left: 2px solid rgb(179, 223, 213);
-}
-
-td:nth-child(odd) {
+  }
+  
+  td:nth-child(odd) {
     border-left: 2px solid rgb(179, 223, 213);
-}
+  }
+  
+  /************** CLASS SELECTORS **************/
+  
+  .centre {
+    min-width: 18.75rem;
+  }
+  
+  .othello-board {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .fitxes {
+    background: rgb(80, 80, 80);
+    height: 30px;
+    width: 800px;
+  }
+  
+  .fila {
+    display: block;
+  }
+  
+  .columna {
+    display: inline-block;
+  }
+  
+  /************** IDENTIFIER SELECTORS **************/
+  

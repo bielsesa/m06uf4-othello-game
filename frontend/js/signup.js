@@ -35,12 +35,8 @@ $().ready(() => {
   $('#password').bind('keyup', comprovaContrasenya);
   $('#password-repeat').bind('keyup', comprovaContrasenya);
 
-  $('form')[0].submit(e => {
-    console.log(
-      `${$('#username').val()} || ${$('#email').val()} || ${$(
-        '#password'
-      ).val()} || `
-    );
+  $('form').on('submit', e => {
+    console.log(`${$('#username').val()} || ${$('#email').val()} || ${$('#password').val()}`);
 
     e.preventDefault();
 
