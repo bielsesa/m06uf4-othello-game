@@ -2,6 +2,7 @@ $().ready(() => {
   const othelloBoard =
     '<div class="fitxes blanques"></div><table></table><div class="fitxes negres"></div>';
   let iniciFiles = 65; // LLETRA A
+  let tamany = 8;
 
   /**** funcions drag&drop ****/
   let allowDrop = ev => {
@@ -10,38 +11,52 @@ $().ready(() => {
 
   let drag = ev => {
     ev.dataTransfer.setData('text', ev.target.id);
+    console.log(`DRAGGED: ${ev.target.id}`);
   };
 
   let drop = ev => {
     ev.preventDefault();
+    console.log(`Dropped disc at: ${ev.target.id}`);
     var data = ev.dataTransfer.getData('text');
     ev.target.appendChild(document.getElementById(data));
+    document.getElementById(data).draggable = false; // un cop s'ha deixat la fitxa al tauler ja no es pot moure
 
     /**** desactivar drop a les caselles que ho tenen amb fitxa ****/
     /**** i activar-lo a les caselles que ho tenen sense fitxa ****/
-    console.log(`Dropped disc at: ${ev.target.id}`);
     let rowId = ev.target.id.charCodeAt(0);
-    let colId = ev.target.id.split("")[1] * 1;
-
+    let colId = ev.target.id.split('')[1] * 1;
 
     let newDroppableCells = [
       String.fromCharCode(rowId) + (colId - 1),
       String.fromCharCode(rowId) + (colId + 1),
       String.fromCharCode(rowId + 1) + (colId + 1),
       String.fromCharCode(rowId - 1) + (colId + 1),
+      String.fromCharCode(rowId + 1) + (colId - 1),
+      String.fromCharCode(rowId - 1) + (colId - 1),
       String.fromCharCode(rowId + 1) + colId,
-      String.fromCharCode(rowId - 1) + colId,
+      String.fromCharCode(rowId - 1) + colId
     ];
 
-    for(cell in newDroppableCells) {
-      console.log(`New droppable cell check, children length: ${$(`#${cell}`).children().length}`);
-      console.log(`New droppable cell check, children: ${$(`#${cell}`).children()}`);
-      if($(`#${cell}`).children().length == 0) {
-        console.log(`NEW DROPPABLE CELL id: ${JSON.stringify($(`#${cell}`))}`);
-        $(`#${cell}`).bind('drop', drop);
-        $(`#${cell}`).bind('dragover', allowDrop);
+    newDroppableCells.forEach(cell => {
+      /**** comprova si la cel·la és a dins de la taula ****/
+      if (
+        cell.charCodeAt(0) >= iniciFiles &&
+        cell.charCodeAt(0) <= iniciFiles + tamany - 1
+      ) {
+        let cellElement = document.getElementById(`${cell}`);
+        /**** comprova si la cel·la és buida (no té una fitxa ja) ****/
+        if ($(`#${cell}`).children().length == 0) {
+          /*$(`#${cell}`).on('drop', drop);
+          $(`#${cell}`).on('dragover', allowDrop);    AMB AIXÒ NO FUNCIONA!!!!!!!!! NOMÉS AMB ADDEVENTLISTENER :(*/
+          cellElement.addEventListener('drop', drop, true);
+          cellElement.addEventListener('dragover', allowDrop, true);
+        } else {
+          /**** comprova si la cel·la té una fitxa del color contrari ****/
+          console.log(`\n\n\n THIS CELL (${cell}) HAS A DISC\n`);
+          console.log(`DISC COLOR: ${cellElement.children[0].getAttribute('src').includes('negra') ? 'negra' : 'blanca'}\n\n\n`);
+        }
       }
-    }
+    });
   };
 
   /**** addEventListeners botons dificultat ****/
@@ -49,14 +64,16 @@ $().ready(() => {
     // neteja el tauler inicial
     $('.othello-board').empty();
     $('.othello-board').html(othelloBoard);
-    generarTauler(4);
+    tamany = 4;
+    generarTauler(tamany);
   });
 
   $('#bt-normal').click(() => {
     // neteja el tauler inicial
     $('.othello-board').empty();
     $('.othello-board').html(othelloBoard);
-    generarTauler(8);
+    tamany = 8;
+    generarTauler(tamany);
   });
 
   $('#bt-hard').click(() => {
@@ -65,7 +82,8 @@ $().ready(() => {
     $('.othello-board').html(
       '<div class="fitxes blanques"></div><table></table><div class="fitxes negres"></div>'
     );
-    generarTauler(12);
+    tamany = 12;
+    generarTauler(tamany);
   });
 
   /**** funció per generar el tauler i les fitxes, donat un tamany ****/
@@ -102,10 +120,6 @@ $().ready(() => {
       `${String.fromCharCode(iniciFiles + (tamany / 2 - 2)) + tamany / 2}`
     ];
 
-    console.log(
-      `DROPPABLE CELLS ID: ${JSON.stringify(droppableCellsInicials)}`
-    );
-
     for (let r = iniciFiles + tamany - 1; r >= iniciFiles; r--) {
       /**** afegeix la fila ****/
       let row = document.createElement('tr');
@@ -122,16 +136,17 @@ $().ready(() => {
           /**** fitxes negres inicials ****/
           fitxa.setAttribute('src', '../frontend/img/fitxa-negra.png');
           fitxa.draggable = false;
+          col.appendChild(fitxa);
         } else if (fitxesBlanquesInicials.includes(col.id)) {
           /**** fitxes blanques inicials ****/
           fitxa.setAttribute('src', '../frontend/img/fitxa-blanca.png');
           fitxa.draggable = false;
+          col.appendChild(fitxa);
         } else if (droppableCellsInicials.includes(col.id)) {
           /**** afegeix els eventlisteners de drag&&drop a les columnes que envolten les fitxes ****/
           col.addEventListener('drop', drop);
           col.addEventListener('dragover', allowDrop);
         }
-        col.appendChild(fitxa);
 
         //col.innerText = `${String.fromCharCode(r)+c}`;
         $(`#row-${String.fromCharCode(r)}`).append(col);
@@ -158,5 +173,6 @@ $().ready(() => {
     }
   };
 
-  generarTauler(8);
+  /**** primera inicialització tauler ****/
+  generarTauler(tamany);
 });
