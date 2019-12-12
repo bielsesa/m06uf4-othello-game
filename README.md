@@ -6,5 +6,5 @@ El joc és multijugador a temps real, entre dos jugadors. Per jugar, els usuaris
 S'utilitza AJAX pel joc a temps real, i MongoDB per guardar les dades dels jugadors/usuaris.
 
 <b>[ENG]</b><br>
-Webpage for playing Othello (aka Reversi) with a friend!<br>
+Webpage for playing Othello (aka Reversi) with a friend (or an enemy)!<br>
 It's real-time using AJAX, and to play you have to register (data is saved in a MongoDB).
