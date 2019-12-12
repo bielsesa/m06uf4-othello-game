@@ -14,36 +14,69 @@ let drop = ev => {
 };
 
 $().ready(() => {
-
   let othelloBoard = [];
   let iniciFiles = 65; // LLETRA A
 
-  let generarTauler = (tamany) => {
-    for (let r = 72; r >= 65; r--) {
+  /**** addEventListeners botons dificultat ****/
+  $('#bt-easy').click(() => {
+    // neteja el tauler inicial
+    $('.othello-board').empty();
+    $('.othello-board').html('<div class="fitxes blanques"></div><table></table><div class="fitxes negres"></div>');    
+    generarTauler(4);
+  });
+
+  $('#bt-normal').click(() => {
+    // neteja el tauler inicial
+    $('.othello-board').empty();
+    $('.othello-board').html('<div class="fitxes blanques"></div><table></table><div class="fitxes negres"></div>');    
+    generarTauler(8);
+  });
+
+  $('#bt-hard').click(() => {
+    // neteja el tauler inicial
+    $('.othello-board').empty();
+    $('.othello-board').html('<div class="fitxes blanques"></div><table></table><div class="fitxes negres"></div>');    
+    generarTauler(12);
+  });
+
+  /**** funció per generar el tauler i les fitxes, donat un tamany ****/
+  let generarTauler = tamany => {
+    let numFitxes = Math.pow(tamany, 2);
+    console.log(
+      `El tamany escollit pel tauler és: ${tamany} x ${tamany} = ${numFitxes}`
+    );
+
+    for (let r = iniciFiles + tamany - 1; r >= iniciFiles; r--) {
       /**** afegeix la fila ****/
       let row = document.createElement('tr');
       row.id = `row-${String.fromCharCode(r)}`;
+      console.log(`Row ID: ${row.id}`);
       $('table')[0].append(row);
 
       /**** afegeix les columnes a la fila ja inserida ****/
-      for (let c = 1; c <= 8; c++) {
+      for (let c = 1; c <= tamany; c++) {
         let col = document.createElement('td');
         col.id = `${String.fromCharCode(r) + c}`;
         let fitxa = document.createElement('img');
 
-        if (col.id == 'D4' || col.id == 'E5') {
+        if (col.id == `${String.fromCharCode(iniciFiles + tamany / 2) + tamany / 2}` ||
+          col.id == `${String.fromCharCode(iniciFiles + tamany / 2 - 1) + (tamany / 2 + 1)}`) {
+
           /**** fitxes negres inicials ****/
           fitxa.setAttribute('src', '../frontend/img/fitxa-negra.png');
-        } else if (col.id == 'D5' || col.id == 'E4') {
+          fitxa.draggable = false;
+
+        } else if (col.id == `${String.fromCharCode(iniciFiles + tamany / 2) + (tamany / 2 + 1)}` ||
+          col.id == `${String.fromCharCode(iniciFiles + (tamany / 2 - 1)) + tamany / 2}`) {
+
           /**** fitxes blanques inicials ****/
           fitxa.setAttribute('src', '../frontend/img/fitxa-blanca.png');
+          fitxa.draggable = false;
+
         } else {
-          /**** llocs buits inicials ****/
-          /**** s'ha de poder fer drop a aquestes columnes ****/
+          /**** afegeix els eventlisteners de drag&&drop a les columnes que envolten les fitxes ****/
           col.addEventListener('drop', drop);
           col.addEventListener('dragover', allowDrop);
-
-          //fitxa.setAttribute('src', '../frontend/img/fitxa-buida.png');
         }
         col.appendChild(fitxa);
 
@@ -53,7 +86,7 @@ $().ready(() => {
     }
 
     /**** afegeix les fitxes de cada jugador ****/
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < numFitxes / 2 - 4; i++) {
       let fb = document.createElement('img');
       fb.setAttribute('src', '../frontend/img/fitxa-blanca.png');
       fb.setAttribute('draggable', 'true');
@@ -70,7 +103,7 @@ $().ready(() => {
       fn.addEventListener('dragstart', drag);
       $('.negres').append(fn);
     }
-  }
+  };
 
-  generarTauler();
+  generarTauler(8);
 });
