@@ -175,7 +175,7 @@ $().ready(() => {
         $('.blanques').append(fb);
 
         let fn = document.createElement('img');
-        fn.setAttribute('src', '../frontend/img/fitxa-negra.png');
+        fn.setAttribute('src', '../img/fitxa-negra.png');
         fn.setAttribute('draggable', 'true');
         fn.id = `n`;
         //console.log(`FITXA NEGRA DRAG: ${fn.getAttribute('draggable')}`);
