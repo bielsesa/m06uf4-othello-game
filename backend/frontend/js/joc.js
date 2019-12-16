@@ -57,6 +57,9 @@ $().ready(() => {
         }
       }
     });
+
+    /* POST AJAX CON EL EV.TARGET.ID  */
+    
   };
 
   /**** addEventListeners botons dificultat ****/
@@ -113,10 +116,8 @@ $().ready(() => {
       `${String.fromCharCode(iniciFiles + tamany / 2 + 1) + (tamany / 2 + 1)}`,
       `${String.fromCharCode(iniciFiles + tamany / 2 + 1) + (tamany / 2 + 2)}`,
       `${String.fromCharCode(iniciFiles + tamany / 2) + (tamany / 2 + 2)}`,
-      `${String.fromCharCode(iniciFiles + (tamany / 2 - 1)) +
-        (tamany / 2 - 1)}`,
-      `${String.fromCharCode(iniciFiles + (tamany / 2 - 2)) +
-        (tamany / 2 - 1)}`,
+      `${String.fromCharCode(iniciFiles + (tamany / 2 - 1)) + (tamany / 2 - 1)}`,
+      `${String.fromCharCode(iniciFiles + (tamany / 2 - 2)) + (tamany / 2 - 1)}`,
       `${String.fromCharCode(iniciFiles + (tamany / 2 - 2)) + tamany / 2}`
     ];
 
