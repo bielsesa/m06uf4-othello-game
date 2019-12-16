@@ -59,7 +59,7 @@ $().ready(() => {
     });
 
     /* POST AJAX CON EL EV.TARGET.ID  */
-    
+
   };
 
   /**** addEventListeners botons dificultat ****/
@@ -135,12 +135,12 @@ $().ready(() => {
 
         if (fitxesNegresInicials.includes(col.id)) {
           /**** fitxes negres inicials ****/
-          fitxa.setAttribute('src', '../frontend/img/fitxa-negra.png');
+          fitxa.setAttribute('src', '../img/fitxa-negra.png');
           fitxa.draggable = false;
           col.appendChild(fitxa);
         } else if (fitxesBlanquesInicials.includes(col.id)) {
           /**** fitxes blanques inicials ****/
-          fitxa.setAttribute('src', '../frontend/img/fitxa-blanca.png');
+          fitxa.setAttribute('src', '../img/fitxa-blanca.png');
           fitxa.draggable = false;
           col.appendChild(fitxa);
         } else if (droppableCellsInicials.includes(col.id)) {
@@ -154,10 +154,26 @@ $().ready(() => {
       }
     }
 
+    let fb = document.createElement('img');
+    fb.setAttribute('src', '../img/fitxa-blanca.png');
+    fb.setAttribute('draggable', 'true');
+    fb.id = `b-${i}`;
+    //console.log(`FITXA BLANCA DRAG: ${fb.getAttribute('draggable')}`);
+    fb.addEventListener('dragstart', drag);
+    $('.blanques').append(fb);
+
+    let fn = document.createElement('img');
+    fn.setAttribute('src', '../frontend/img/fitxa-negra.png');
+    fn.setAttribute('draggable', 'true');
+    fn.id = `n-${i}`;
+    //console.log(`FITXA NEGRA DRAG: ${fn.getAttribute('draggable')}`);
+    fn.addEventListener('dragstart', drag);
+    $('.negres').append(fn);
+
     /**** afegeix les fitxes de cada jugador ****/
     for (let i = 0; i < numFitxes / 2 - 2; i++) {
       let fb = document.createElement('img');
-      fb.setAttribute('src', '../frontend/img/fitxa-blanca.png');
+      fb.setAttribute('src', '../img/fitxa-blanca.png');
       fb.setAttribute('draggable', 'true');
       fb.id = `b-${i}`;
       //console.log(`FITXA BLANCA DRAG: ${fb.getAttribute('draggable')}`);
