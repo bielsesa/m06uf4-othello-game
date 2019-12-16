@@ -1,9 +1,10 @@
-let server = require('./servidor');
-let encaminador = require('./encaminador');
-let manegadorPeticions = require('./manegadorPeticions');
+const server = require('./servidor');
+const encaminador = require('./encaminador');
+const manegadorPeticions = require('./manegadorPeticions');
 
-let manegadors = {};
+const manegadors = {};
 manegadors['/'] = manegadorPeticions.index;
+manegadors['/index'] = manegadorPeticions.index;
 manegadors['/favicon.ico'] = manegadorPeticions.favicon;
 manegadors['/usuaris/signup'] = manegadorPeticions.signup;
 manegadors['/usuaris/login'] = manegadorPeticions.login;

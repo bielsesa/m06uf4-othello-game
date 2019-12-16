@@ -1,0 +1,28 @@
+{
+  "name": "othello-nodejs-backend",
+  "version": "1.0.0",
+  "description": "Backend per l'aplicacio Web del joc de l'Othello (M06UF4)",
+  "main": "index.js",
+  "dependencies": {
+    "mongodb": "^3.4.0",
+    "nodemon": "^2.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bielsesa/PRACTICA_ENTORN_CLIENT_UF4.git"
+  },
+  "keywords": [
+    "nodejs",
+    "server"
+  ],
+  "author": "Biel Serrano <bielsesa@gmail.com> (redshift.es)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bielsesa/PRACTICA_ENTORN_CLIENT_UF4/issues"
+  },
+  "homepage": "https://github.com/bielsesa/PRACTICA_ENTORN_CLIENT_UF4#readme"
+}

@@ -120,7 +120,7 @@ $().ready(() => {
       `${String.fromCharCode(iniciFiles + (tamany / 2 - 2)) + tamany / 2}`
     ];
 
-    for (let r = iniciFiles + tamany - 1; r >= iniciFiles; r--) {
+    for (let r = iniciFiles; r <= iniciFiles + tamany - 1; r++) {
       /**** afegeix la fila ****/
       let row = document.createElement('tr');
       row.id = `row-${String.fromCharCode(r)}`;

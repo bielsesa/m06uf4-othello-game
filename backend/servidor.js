@@ -1,87 +1,118 @@
-let http = require('http');
-let url = require('url');
-let debug = require('./helperFunctions.js');
-let fs = require('fs');
-let path = require('path');
+const http = require('http');
+const url = require('url');
+const fs = require('fs');
+const path = require('path');
+const debug = require('./helperFunctions');
+// you can pass the parameter in the command line. e.g. node static_server.js 3000
+const port = process.argv[2] || 9000;
 
 const mimeType = {
-  '.ico': 'image/x-icon',
-  '.html': 'text/html',
-  '.js': 'text/javascript',
-  '.json': 'application/json',
-  '.css': 'text/css',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.wav': 'audio/wav',
-  '.mp3': 'audio/mpeg',
-  '.svg': 'image/svg+xml',
-  '.pdf': 'application/pdf',
-  '.doc': 'application/msword',
-  '.eot': 'appliaction/vnd.ms-fontobject',
-  '.ttf': 'aplication/font-sfnt'
+        '.ico': 'image/x-icon',
+        '.html': 'text/html',
+        '.js': 'text/javascript',
+        '.json': 'application/json',
+        '.css': 'text/css',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.wav': 'audio/wav',
+        '.mp3': 'audio/mpeg',
+        '.svg': 'image/svg+xml',
+        '.pdf': 'application/pdf',
+        '.doc': 'application/msword',
+        '.eot': 'appliaction/vnd.ms-fontobject',
+        '.ttf': 'aplication/font-sfnt',
 };
 
-let iniciar = (encaminar, manegadorPeticions) => {
-  let onRequest = (request, response) => {
-    let pathname = url.parse(request.url).pathname;
-    let dadesPOST = '';
-    let resposta;
+const iniciar = (encaminar, manegadorPeticions) => {
+        const onreq = (req, res) => {
+                debug.writeDebug(`${req.method} ${req.url}`);
 
-    request.setEncoding('utf8');
+                // parseja la URL
+                // const parsedUrl = url.parse(req.url);
+                const { pathname } = url.parse(req.url);
 
-    request.addListener('data', post => {
-      dadesPOST += post;
-      debug.writeDebug(`Rebut part del POST: ${post}`);
-    });
+                // extract URL path
+                // Avoid https://en.wikipedia.org/wiki/Directory_traversal_attack
+                // e.g curl --path-as-is http://localhost:9000/../fileInDanger.txt
+                // by limiting the path to current directory only
+                /* const sanitizePath = path.normalize(parsedUrl.pathname).replace(/^(\.\.[\/\\])+/, '');
+                const pathname = path.join(__dirname, sanitizePath); */
 
-    request.addListener('end', () => {
-      debug.writeDebug('Entro a END');
+                // body data the client might send us
+                let dadesPOST = '';
 
-      resposta = encaminar(manegadorPeticions, pathname, response, dadesPOST);
+                // we'll save the response here
+                // will depend on the request (since there'll be AJAX requests too)
+                let resposta;
 
-      debug.writeDebug(`Contingut resposta: ${resposta}`);
+                // set encoding of response to UTF-8
+                req.setEncoding('utf8');
 
-      if (resposta != undefined) {
-        debug.writeDebug('Contingut resposta NO és undefined');
+                req.addListener('data', post => {
+                        dadesPOST += post;
+                        debug.writeDebug(`Rebut part del POST: ${post}`);
+                });
 
-        if (resposta.tipus == 'arxiu') {
-          fs.readFile('./frontend/index.html', (err, contingut) => {
-            if (!err) {
-              let ext = path.parse(resposta.nomArxiu).ext;
-              response.writeHead(200, {
-                'Content-Type': `${mimeType[ext]}; charset=utf-8`
-              });
-              response.write(contingut);
-              response.end();
-            } else {
-              console.log(`S'ha produït un error: ${err}`);
-              response.writeHead(500, {
-                'Content-Type': 'text/plain; charset=utf-8'
-              });
-              response.write('Error 500');
-              response.end();
-            }
-          });
-        } else {
-          response.writeHead(200, {
-            'Content-Type': 'text/plain; charset=utf-8'
-          });
-          
-          response.write(resposta.res)
-          response.end();
-        }
-      } else {
-        debug.writeDebug('ContingutResposta ÉS undefined');
-        response.writeHead(500, {
-          'Content-Type': 'text/plain; charset=utf-8'
-        }); //TODO CAMBIAR
-        response.end();
-      }
-    });
-  };
+                req.addListener('end', () => {
+                        resposta = encaminar(manegadorPeticions, pathname, res, dadesPOST);
 
-  http.createServer(onRequest).listen(8888);
-  console.log(`Servidor iniciat al port 8888`);
+                        debug.writeDebug(`Contingut resposta: ${JSON.stringify(resposta)}`);
+
+                        if (resposta !== undefined) {
+                                if (resposta.tipus === 'arxiu') {
+                                        debug.writeDebug(`Nom arxiu de la resposta: ${resposta.nomArxiu}`);
+                                        fs.exists(resposta.nomArxiu, function(exist) {
+                                                if (!exist) {
+                                                        // if the file is not found, return 404
+                                                        res.statusCode = 404;
+                                                        res.end(`File ${resposta.nomArxiu} not found!`);
+                                                        return;
+                                                }
+
+                                                // if is a directory, then look for index.html
+                                                /* if (fs.statSync(pathname).isDirectory()) {
+                                                        resposta.nomArxiu += '/index.html';
+                                                } */
+
+                                                // read file from file system
+                                                fs.readFile(resposta.nomArxiu, function(err, data) {
+                                                        if (err) {
+                                                                res.statusCode = 500;
+                                                                res.end(`Error getting the file: ${err}.`);
+                                                        } else {
+                                                                // based on the URL path, extract the file extention. e.g. .js, .doc, ...
+                                                                const { ext } = path.parse(resposta.nomArxiu);
+                                                                // if the file is found, set Content-type and send data
+                                                                res.setHeader(
+                                                                        'Content-type',
+                                                                        mimeType[ext] || 'text/plain'
+                                                                );
+                                                                res.end(data);
+                                                        }
+                                                });
+                                        });
+                                } else {
+                                        // AJAX and other kinds of petitions
+
+                                        res.writeHead(200, {
+                                                'Content-Type': 'text/plain; charset=utf-8',
+                                        });
+
+                                        res.write(resposta.res);
+                                        res.end();
+                                }
+                        } else {
+                                debug.writeDebug('ContingutResposta ÉS undefined');
+                                res.writeHead(500, {
+                                        'Content-Type': 'text/plain; charset=utf-8',
+                                }); // TODO CAMBIAR
+                                res.end();
+                        }
+                });
+        };
+
+        http.createServer(onreq).listen(port);
+        debug.writeDebug(`Servidor iniciat al port ${port}.`);
 };
 
 exports.iniciar = iniciar;
