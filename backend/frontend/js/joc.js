@@ -1,4 +1,7 @@
 $().ready(() => {
+// Guardar el id del jugador aquí para enviarlo en el POST del AJAX
+// Guardar el id de la sala
+
     const othelloBoard =
         '<div class="fitxes blanques"></div><table></table><div class="fitxes negres"></div>';
     let iniciFiles = 65; // LLETRA A

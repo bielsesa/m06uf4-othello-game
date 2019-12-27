@@ -7,7 +7,7 @@ const debug = require('./helperFunctions');
 const port = process.argv[2] || 9000;
 
 /* Info de les partides */
-var sales = [ { 'jugadorN': {}, 'jugadorB': {} } ];
+const sales = [{ jugadorN: {}, jugadorB: {} }];
 
 const mimeType = {
         '.ico': 'image/x-icon',
@@ -30,8 +30,12 @@ const iniciar = (encaminar, manegadorPeticions) => {
         const onreq = (req, res) => {
                 debug.writeDebug(`${req.method} ${req.url}`);
 
-                // parseja la URL
-                // const parsedUrl = url.parse(req.url);
+                /* extreu el PATHNAME de la URL */
+
+                /* Exemple: url -> localhost:9000/index */
+
+                /* Exemple: url -> localhost:9000/index */
+
                 const { pathname } = url.parse(req.url);
 
                 // extract URL path
@@ -58,6 +62,7 @@ const iniciar = (encaminar, manegadorPeticions) => {
 
                 req.addListener('end', () => {
                         resposta = encaminar(manegadorPeticions, pathname, res, dadesPOST);
+                        debug.writeDebug(`SERVIDOR: ${dadesPOST}`);
 
                         debug.writeDebug(`Contingut resposta: ${JSON.stringify(resposta)}`);
 
