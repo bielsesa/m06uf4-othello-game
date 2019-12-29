@@ -3,9 +3,7 @@ const debug = require('./helperFunctions');
 
 class Jugador {
         nom;
-
         email;
-
         contrasenya;
 
         constructor(nom, email, contrasenya) {
@@ -15,24 +13,31 @@ class Jugador {
 
                 /* Registre base de dades */
                 try {
-                    debug.writeDebug(`URL bases de dades: ${dadesBd.bd}`);
-                    
+                        debug.writeDebug(`URL bases de dades: ${dadesBd.bd}`);
+
                         dadesBd.mongoClient.connect(dadesBd.url, (err, db) => {
                                 if (err) throw err;
 
                                 debug.writeDebug(`URL bases de dades: ${dadesBd.bd}`);
-                                db.db(dadesBd.bd)
-                                        .collection(dadesBd.jugadorsCollection)
-                                        .insertOne({
-                                                nom,
-                                                email,
-                                                contrasenya,
-                                        });
 
-                                db.close();
+                                if (!this.existeixJugador) {
+                                        db.db(dadesBd.bd)
+                                                .collection(dadesBd.jugadorsCollection)
+                                                .insertOne({
+                                                        nom,
+                                                        email,
+                                                        contrasenya,
+                                                });
+
+                                        db.close();
+                                } else {
+                                        console.log('Aquest jugador ja existeix.');
+                                }
+
+
                         });
                 } catch (error) {
-                    debug.writeDebug(`URL bases de dades: ${dadesBd.bd}`);
+                        debug.writeDebug(`URL bases de dades: ${dadesBd.bd}`);
                         debug.writeDebug(
                                 `Hi ha hagut un error a l'hora d'inserir el jugador a la base de dades.Error: ${error}`
                         );

@@ -1,9 +1,9 @@
 const querystring = require('querystring');
 const fs = require('fs');
-const { exec } = require('child_process');
+const path = require('path');
 const Jugador = require('./Jugador');
 
-const rootPath = './frontend/';
+const rootPath = './frontend';
 
 const mimeType = {
         '.ico': 'image/x-icon',
@@ -22,76 +22,81 @@ const mimeType = {
         '.ttf': 'aplication/font-sfnt',
 };
 
-let child;
 const debug = require('./helperFunctions');
 
-const index = res => ({ tipus: 'arxiu', nomArxiu: `${rootPath}index.html` });
+/* arxius estatics */
 
-const signup = res => ({ tipus: 'arxiu', nomArxiu: `${rootPath}signup.html` });
-const signupScript = res => ({ tipus: 'arxiu', nomArxiu: `${rootPath}/js/signup.js` });
-const signupUsuari = (res, dades) => {
-        // OK 200
-        //debug.writeDebug(`Dades jugador (split): nom = ${dadesSplit[0]}, email = ${dadesSplit[1]}, contrasenya = ${dadesSplit[2]} `);
-        separarDades(dades);
-        const jugador = new Jugador(dades.nom, dades.email, dades.password);
-        //debug.writeDebug(`Objecte jugador BD: ${JSON.stringify(jugador)}`);
+const index = res => { sendFile(res, `${rootPath}/index.html`); };
+
+const signup = (res) => { sendFile(res, `${rootPath}/signup.html`); };
+const signupScript = res => { sendFile(res, `${rootPath}/js/signup.js`); };
+
+const login = res => { sendFile(res, `${rootPath}/login.html`); };
+const loginScript = res => { sendFile(res, `${rootPath}/js/login.js`); };
+
+const joc = res => { sendFile(res, `${rootPath}/joc.html`); };
+const jocScript = res => { sendFile(res, `${rootPath}/js/joc.js`); };
+
+const othelloLogo = res => { sendFile(res, `${rootPath}/img/othello.png`) };
+const fitxaBlanca = res => { sendFile(res, `${rootPath}/img/fitxa-blanca.png`); };
+const fitxaNegra = res => { sendFile(res, `${rootPath}/img/fitxa-negra.png`); };
+
+const favicon = res => { sendFile(res, `${rootPath}/favicon.ico`); };
+const styles = res => { sendFile(res, `${rootPath}/css/styles.css`); };
+const jquery = res => { sendFile(res, `${rootPath}/jslibs/jquery-3.4.1.js`); };
+
+/* consultes ajax */
+const signupUsuari = (res, data) => {
+        console.log('Manegador petició SIGNUP');
+        let parsedData = querystring.parse(data); // <-- HACE EL PARSE DE LOS DATOS DEL POST!
+        let nom = parsedData['nom'], email = parsedData['email'], pwd = parsedData['password']
+        console.log(`Parsed data: 
+        nom = ${JSON.stringify(nom)}
+        email = ${JSON.stringify(email)}
+        psswd = ${JSON.stringify(password)}
+        `);
+        let resposta = `<p>Nom: ${nom}</p><p>Email: ${email}</p><p>Password: ${password}</p>`;
+
+        /* connexió BD i registre */
+        let nouJugador = new Jugador(nom, email, password);
+
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        return res.end(resposta);
 };
 
-const login = res => ({ tipus: 'arxiu', nomArxiu: `${rootPath}login.html` });
-const loginScript = res => ({ tipus: 'arxiu', nomArxiu: `${rootPath}/js/login.js` });
+/* funció lectura arxius */
+const sendFile = (res, pathname) => {
+        console.log(`PATHNAME: ${pathname}`);
 
-const joc = res => ({ tipus: 'arxiu', nomArxiu: `${rootPath}joc.html` });
-const jocScript = res => ({ tipus: 'arxiu', nomArxiu: `${rootPath}js/joc.js` });
-
-// const iniciarPartida = res => 'iniciar partida';
-
-/* funció per llegir un arxiu */
-/* const llegirArxiu = pathArxiu => {  
-        fs.exists(pathArxiu, function(exist) {
+        fs.exists(pathname, exist => {
                 if (!exist) {
                         // if the file is not found, return 404
                         res.statusCode = 404;
-                        res.end(`File ${pathArxiu} not found!`);
-                        return;
+                        return res.end(`File index.html not found!`);
                 }
 
                 // if is a directory, then look for index.html
-                // if (fs.statSync(pathname).isDirectory()) {
-                //pathArxiu += '/index.html';
-        } 
+                if (fs.statSync(pathname).isDirectory()) {
+                        pathname += './index.html';
+                }
 
                 // read file from file system
-                fs.readFile(pathArxiu, function(err, data) {
+                fs.readFile(pathname, function (err, data) {
                         if (err) {
                                 res.statusCode = 500;
-                                res.end(`Error getting the file: ${err}.`);
+                                return res.end(`Error getting the file: ${err}.`);
                         } else {
                                 // based on the URL path, extract the file extention. e.g. .js, .doc, ...
-                                const { ext } = path.parse(pathArxiu);
+                                const ext = path.parse(pathname).ext;
                                 // if the file is found, set Content-type and send data
                                 res.setHeader('Content-type', mimeType[ext] || 'text/plain');
-                                res.end(data);
+                                return res.end(data);
                         }
                 });
         });
-}; */
+};
 
-/* separar dades post */
-const separarDades = (dadesPost) => {
-        dadesArray = dadesPost.split('&');
-        dadesArray.forEach(item => {
-                console.log(`item indexof: ${item.indexOf('=')}`);
-                item = item.slice(item.indexOf('='), (item.indexOf('=') + 1));
-                console.log(`ITEM SPLICEADO: ${item}`);
-        })
-}
-
-/* arxius estatics */
-const favicon = res => ({ tipus: 'arxiu', nomArxiu: 'favicon.ico' });
-const othelloLogo = res => ({ tipus: 'arxiu', nomArxiu: `${rootPath}img/othello.png` });
-const fitxaBlanca = res => ({ tipus: 'arxiu', nomArxiu: `${rootPath}img/fitxa-blanca.png` });
-const fitxaNegra = res => ({ tipus: 'arxiu', nomArxiu: `${rootPath}img/fitxa-negra.png` });
-const styles = res => ({ tipus: 'arxiu', nomArxiu: `${rootPath}css/styles.css` });
+/* exports */
 
 exports.index = index;
 exports.signup = signup;
@@ -101,9 +106,9 @@ exports.login = login;
 exports.loginScript = loginScript;
 exports.joc = joc;
 exports.jocScript = jocScript;
-// exports.iniciarPartida = iniciarPartida;
 exports.favicon = favicon;
 exports.styles = styles;
 exports.othelloLogo = othelloLogo;
 exports.fitxaBlanca = fitxaBlanca;
 exports.fitxaNegra = fitxaNegra;
+exports.jquery = jquery;

@@ -1,6 +1,7 @@
 $().ready(() => {
         $('#username').bind('keyup', e => {
                 // CONSULTA AJAX PER MIRAR SI EL USERNAME JA ESTÀ AGAFAT
+
         });
 
         $('#email').bind('keyup', e => {
@@ -34,39 +35,24 @@ $().ready(() => {
         $('#password').bind('keyup', comprovaContrasenya);
         $('#password-repeat').bind('keyup', comprovaContrasenya);
 
-        $('form').on('submit', e => {
+        $('button[type="submit"]').on('click', e => {
                 e.preventDefault();
                 console.log(`${$('#username').val()} || ${$('#email').val()} || ${$('#password').val()}`);
                 // CONSULTA AJAX PER ENVIAR LES DADES I GUARDAR-LES A LA BD
-                /* $.post(
-                        '/signupUsuari',
-                        {
-                                nom: $('#username').val(),
-                                email: $('#email').val(),
-                                password: $('#password').val(),
-                        },
-                        function(data, status) {
-                                alert(`Data: ${data}\nStatus: ${status}`);
-                        }
-                ); */
-
                 $.ajax({
+                        url: '/signupUsuari',
+                        type: 'POST',
                         contentType: 'application/json',
                         data: {
-                                nom: $('#username').val(),
-                                email: $('#email').val(),
-                                password: $('#password').val(),
+                                nom: `${$('#username').val()}`,
+                                email: `${$('#email').val()}`,
+                                psswd: `${$('#password').val()}`,
                         },
-                        dataType: 'json',
-                        success(data) {
-                                console.log('device control succeeded');
-                        },
-                        error() {
-                                console.log('Device control failed');
-                        },
-                        processData: false,
-                        type: 'POST',
-                        url: '/signupUsuari',
-                });
+                        dataType: 'text/html',
+                        complete: (result, status, xhr) => {
+                                console.log(`Result: ${JSON.stringify(result)}`);
+                                $("#sent-data").html(result.responseText);
+                        }
+                })
         });
 });

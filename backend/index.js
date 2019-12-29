@@ -12,7 +12,6 @@ manegadors['/login'] = manegadorPeticions.login;
 manegadors['/js/login.js'] = manegadorPeticions.loginScript;
 manegadors['/joc'] = manegadorPeticions.joc;
 manegadors['/js/joc.js'] = manegadorPeticions.jocScript;
-// manegadors['/usuaris/iniciarPartida'] = manegadorPeticions.iniciarPartida;
 
 /* arxius estatics */
 manegadors['/img/othello.png'] = manegadorPeticions.othelloLogo;
