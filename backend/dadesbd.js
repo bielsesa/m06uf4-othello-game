@@ -4,6 +4,7 @@ const url = 'mongodb://localhost:27017/'; // connecta a la base de dades 'othell
 const bd = 'othello';
 const jugadorsCollection = 'jugadors';
 const puntuacionsCollection = 'puntuacions';
+
 /*
 const registraJugador = nouJugador => {
         try {

@@ -10,6 +10,8 @@
         "printWidth": 120,
         "tabWidth": 8
       }
-    ]
+    ],
+    "object-shorthand": [2, "methods"],
+    "eqeqeq": [0, "always"]
   }
 }

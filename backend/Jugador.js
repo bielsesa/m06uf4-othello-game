@@ -3,38 +3,43 @@ const debug = require('./helperFunctions');
 
 class Jugador {
         nom;
-        email;
-        contrasenya;
 
-        constructor(nom, email, contrasenya) {
+        email;
+
+        password;
+
+        constructor(nom, email, password) {
                 this.nom = nom;
                 this.email = email;
-                this.contrasenya = contrasenya;
+                this.password = password;
 
                 /* Registre base de dades */
                 try {
-                        debug.writeDebug(`URL bases de dades: ${dadesBd.bd}`);
-
                         dadesBd.mongoClient.connect(dadesBd.url, (err, db) => {
                                 if (err) throw err;
 
-                                debug.writeDebug(`URL bases de dades: ${dadesBd.bd}`);
+                                // const j = { nom: nom, email: email, password: password };
 
-                                if (!this.existeixJugador) {
-                                        db.db(dadesBd.bd)
-                                                .collection(dadesBd.jugadorsCollection)
-                                                .insertOne({
-                                                        nom,
-                                                        email,
-                                                        contrasenya,
-                                                });
+                                db.db(dadesBd.bd)
+                                        .collection(dadesBd.jugadorsCollection)
+                                        .update(
+                                                { nom: this.nom },
+                                                { nom: nom, email: email, password: password },
+                                                { upsert: true },
+                                                (err, res) => {
+                                                        debug.writeDebug(`Res: ${JSON.stringify(res)}.`);
+                                                        if (res.result.nModified != 0) {
+                                                                debug.writeDebug(`El jugador ja existeix.`);
+                                                        } else {
+                                                                debug.writeDebug(`Jugador nou registrat.`);
+                                                        }
+                                                }
+                                        );
+                                // UPSERT serveix per actualitzar si ja existeix, o inserir nou si no
+                                // d'aquesta manera nosaltres assegurem que no s'insereix un jugador si ja existeix
+                                // TODO si el jugador ja existeix, avisar de que existeix!
 
-                                        db.close();
-                                } else {
-                                        console.log('Aquest jugador ja existeix.');
-                                }
-
-
+                                db.close();
                         });
                 } catch (error) {
                         debug.writeDebug(`URL bases de dades: ${dadesBd.bd}`);
@@ -45,27 +50,6 @@ class Jugador {
         }
 
         /* ATENCION IMPORTANT: Los métodos se ponen sin ENCAPSULACION ni FUNCTION */
-        existeixJugador() {
-                let existeix = false;
-                try {
-                        dadesBd.mongoClient.connect(dadesBd.url, (err, db) => {
-                                if (err) throw err;
-
-                                db.db(dadesBd.bd)
-                                        .collection(dadesBd.jugadorsCollection)
-                                        .findOne({ nom: this.nom }, (err, res) => {
-                                                if (err) throw err;
-                                                if (res) existeix = true;
-                                        });
-
-                                db.close();
-                        });
-
-                        return existeix;
-                } catch (error) {
-                        debug.writeDebug(`Hi ha hagut un error a l'hora de consultar la base de dades.Error: ${error}`);
-                }
-        }
 }
 
 module.exports = Jugador;
