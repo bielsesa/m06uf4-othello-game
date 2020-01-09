@@ -1,4 +1,7 @@
 $().ready(() => {
+// Guardar el id del jugador aquí para enviarlo en el POST del AJAX
+// Guardar el id de la sala
+
     const othelloBoard =
         '<div class="fitxes blanques"></div><table></table><div class="fitxes negres"></div>';
     let iniciFiles = 65; // LLETRA A
@@ -18,7 +21,7 @@ $().ready(() => {
         ev.preventDefault();
         console.log(`Dropped disc at: ${ev.target.id}`);
         var data = ev.dataTransfer.getData('text');
-        ev.target.appendChild(document.getElementById(data).cloneNode(true));
+        if (ev.target.children.length == 0) ev.target.appendChild(document.getElementById(data).cloneNode(true));        
         document.getElementById(data).draggable = false; // un cop s'ha deixat la fitxa al tauler ja no es pot moure
 
         /**** desactivar drop a les caselles que ho tenen amb fitxa ****/
@@ -39,10 +42,8 @@ $().ready(() => {
 
         newDroppableCells.forEach(cell => {
             /**** comprova si la cel·la és a dins de la taula ****/
-            if (
-                cell.charCodeAt(0) >= iniciFiles &&
-                cell.charCodeAt(0) <= iniciFiles + tamany - 1
-            ) {
+            if (cell.charCodeAt(0) >= iniciFiles &&
+                cell.charCodeAt(0) <= iniciFiles + tamany - 1) {
                 let cellElement = document.getElementById(`${cell}`);
                 /**** comprova si la cel·la és buida (no té una fitxa ja) ****/
                 if ($(`#${cell}`).children().length == 0) {
@@ -54,6 +55,8 @@ $().ready(() => {
                     /**** comprova si la cel·la té una fitxa del color contrari ****/
                     console.log(`\n\n\n THIS CELL (${cell}) HAS A DISC\n`);
                     console.log(`DISC COLOR: ${cellElement.children[0].getAttribute('src').includes('negra') ? 'negra' : 'blanca'}\n\n\n`);
+                    cellElement.removeEventListener('drop', drop, true);
+                    cellElement.removeEventListener('dragover', allowDrop, true);
                 }
             }
         });
@@ -181,9 +184,6 @@ $().ready(() => {
         //console.log(`FITXA NEGRA DRAG: ${fn.getAttribute('draggable')}`);
         fn.addEventListener('dragstart', drag);
         $('.negres').append(fn);
-
-
-
     };
 
     /**** primera inicialització tauler ****/

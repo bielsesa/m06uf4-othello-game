@@ -1,16 +1,11 @@
 const mongoClient = require('mongodb').MongoClient;
-const debug = require('./helperFunctions');
 
-const url = 'mongodb://localhost:27017/othello'; // connecta a la base de dades 'othello' dins d'una bd MongoDB local al port 27017
+const url = 'mongodb://localhost:27017/'; // connecta a la base de dades 'othello' dins d'una bd MongoDB local al port 27017
+const bd = 'othello';
+const jugadorsCollection = 'jugadors';
+const puntuacionsCollection = 'puntuacions';
 
-const connexiobd = () => {
-        mongoClient.connect(url, (err, db) => {
-                if (err) throw err;
-                debug.writeDebug('Connexió a la base de dades.');
-                db.close();
-        });
-};
-
+/*
 const registraJugador = nouJugador => {
         try {
                 mongoClient.connect(url, (err, db) => {
@@ -32,29 +27,26 @@ const registraJugador = nouJugador => {
         }
 };
 
-/* Insereix una puntuació */
 const inserirPuntuacio = (jugador, puntsJugador) => {
         try {
                 mongoClient.connect(url, (err, db) => {
-                        if (err) throw err;
-
-                        db.db('othello')
-                                .collection('puntuacions')
-                                .insertOne({ punts: puntsJugador, nom: jugador.nom });
-
-                        db.close();
+                    if (err) throw err;
+    
+                    db.db('othello')
+                        .collection('puntuacions')
+                        .insertOne({ punts: puntsJugador, nom: jugador.nom });
+    
+                    db.close();
                 });
-        } catch (error) {
-                debug.writeDebug(`Hi ha hagut un error a l'hora d'inserir la puntuació a la base de dades.
-      Error: ${error}`);
-        }
+            } catch (error) {
+                debug.writeDebug(`Hi ha hagut un error a l'hora d'inserir la puntuació a la base de dades. Error: ${error}`);
+            }
 };
 
 const actualitzaJugador = jugador => {};
 
 const actualitzaPuntuacio = (jugador, punts) => {};
 
-/* Comprova si el nom d'usuari ja existeix */
 const nomJugadorExistent = nouNom => {
         let existeix = false;
         try {
@@ -97,10 +89,16 @@ const mostraMillorsPuntuacions = num => {
 };
 
 /* Exportacions */
-exports.connexiobd = connexiobd;
+/* exports.connexiobd = connexiobd;
 exports.registraJugador = registraJugador;
 exports.inserirPuntuacio = inserirPuntuacio;
 exports.actualitzaJugador = actualitzaJugador;
 exports.actualitzaPuntuacio = actualitzaPuntuacio;
 exports.nomJugadorExistent = nomJugadorExistent;
-exports.mostraMillorsPuntuacions = mostraMillorsPuntuacions;
+exports.mostraMillorsPuntuacions = mostraMillorsPuntuacions; */
+
+exports.mongoClient = mongoClient;
+exports.bd = bd;
+exports.url = url;
+exports.jugadorsCollection = jugadorsCollection;
+exports.puntuacionsCollection = puntuacionsCollection;
