@@ -17,6 +17,13 @@ const loginScript = res => ({ tipus: 'arxiu', nomArxiu: rootPath + '/js/login.js
 const joc = res => ({ tipus: 'arxiu', nomArxiu: rootPath + 'joc.html' });
 const jocScript = res => ({ tipus: 'arxiu', nomArxiu: rootPath + 'js/joc.js' });
 
+const mourePieza = (res, postData) {
+    var jugadorId = postData.jugadorId;
+    var salaId = postData.salaId;
+
+    res = { tipus: 'pasaTorn', 'jugadorId': jugadorId, 'salaId': salaId };
+}
+
 //const iniciarPartida = res => 'iniciar partida';
 
 /* arxius estatics */
@@ -39,4 +46,3 @@ exports.styles = styles;
 exports.othelloLogo = othelloLogo;
 exports.fitxaBlanca = fitxaBlanca;
 exports.fitxaNegra = fitxaNegra;
-
