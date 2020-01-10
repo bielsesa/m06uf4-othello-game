@@ -1,9 +1,73 @@
 $().ready(() => {
-// Guardar el id del jugador aquí para enviarlo en el POST del AJAX
-// Guardar el id de la sala
+    // Guardar el id del jugador aquí para enviarlo en el POST del AJAX
+    // Guardar el id de la sala
 
-    const othelloBoard =
-        '<div class="fitxes blanques"></div><table></table><div class="fitxes negres"></div>';
+    const tablero = [
+        [-1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, 0, 0, 0, 0, -1, -1],
+        [-1, -1, 0, 1, 2, 0, -1, -1],
+        [-1, -1, 0, 2, 1, 0, -1, -1],
+        [-1, -1, 0, 0, 0, 0, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1]
+    ];
+
+    function generacionTablero() {
+
+        for (let i = 0; i < 8; i++) {
+            let row = document.createElement('tr');
+            row.id = i;
+            $('table')[0].append(row);
+
+
+            for (let j = 0; j < 8; j++) {
+
+                let col = document.createElement('td');
+                col.id = i + '' + j;
+                console.log(`colId: ${col.id}`)
+                let fitxa = document.createElement('img');
+
+                if (tablero[i][j] === 2) {
+                    /**** fitxes negres inicials ****/
+                    fitxa.setAttribute('src', '../img/fitxa-negra.png');
+                    fitxa.draggable = false;
+                    col.appendChild(fitxa);
+                } else if (tablero[i][j] === 1) {
+                    /**** fitxes blanques inicials ****/
+                    fitxa.setAttribute('src', '../img/fitxa-blanca.png');
+                    fitxa.draggable = false;
+                    col.appendChild(fitxa);
+                } else if (tablero[i][j] === 0) {
+                    /**** afegeix els eventlisteners de drag&&drop a les columnes que envolten les fitxes ****/
+                    col.addEventListener('drop', drop);
+                    col.addEventListener('dragover', allowDrop);
+                }
+
+                //col.innerText = `${String.fromCharCode(r)+c}`;
+                $(`tr#${i}`).append(col);
+
+            }
+
+            /**** afegeix les fitxes de cada jugador ****/
+
+            let fb = document.createElement('img');
+            fb.setAttribute('src', '../img/fitxa-blanca.png');
+            fb.setAttribute('draggable', 'true');
+            fb.id = `b`;
+            //console.log(`FITXA BLANCA DRAG: ${fb.getAttribute('draggable')}`);
+            fb.addEventListener('dragstart', drag);
+            $('.blanques').append(fb);
+
+            let fn = document.createElement('img');
+            fn.setAttribute('src', '../img/fitxa-negra.png');
+            fn.setAttribute('draggable', 'true');
+            fn.id = `n`;
+            //console.log(`FITXA NEGRA DRAG: ${fn.getAttribute('draggable')}`);
+            fn.addEventListener('dragstart', drag);
+            $('.negres').append(fn);
+        }
+    }
     let iniciFiles = 65; // LLETRA A
     let tamany = 8;
 
@@ -21,40 +85,71 @@ $().ready(() => {
         ev.preventDefault();
         console.log(`Dropped disc at: ${ev.target.id}`);
         var data = ev.dataTransfer.getData('text');
-        if (ev.target.children.length == 0) ev.target.appendChild(document.getElementById(data).cloneNode(true));        
+        if (ev.target.children.length == 0) ev.target.appendChild(document.getElementById(data).cloneNode(true));
         document.getElementById(data).draggable = false; // un cop s'ha deixat la fitxa al tauler ja no es pot moure
 
         /**** desactivar drop a les caselles que ho tenen amb fitxa ****/
         /**** i activar-lo a les caselles que ho tenen sense fitxa ****/
-        let rowId = ev.target.id.charCodeAt(0);
+
+        console.log(`${JSON.stringify(data)}`);
+        let colorFitxa = data == 'n' ? 2 : 1;
+
+        /**** Row i Col on s'ha posat la fitxa ****/
+        let rowId = ev.target.id.split('')[0] * 1;
         let colId = ev.target.id.split('')[1] * 1;
 
-        let newDroppableCells = [
-            String.fromCharCode(rowId) + (colId - 1),
-            String.fromCharCode(rowId) + (colId + 1),
-            String.fromCharCode(rowId + 1) + (colId + 1),
-            String.fromCharCode(rowId - 1) + (colId + 1),
-            String.fromCharCode(rowId + 1) + (colId - 1),
-            String.fromCharCode(rowId - 1) + (colId - 1),
-            String.fromCharCode(rowId + 1) + colId,
-            String.fromCharCode(rowId - 1) + colId
+        tablero[rowId][colId] = colorFitxa;
+
+        let surroundingCells = [
+            rowId + '' + (colId - 1),
+            rowId + '' + (colId + 1),
+            (rowId + 1) + '' + (colId + 1),
+            (rowId - 1) + '' + (colId + 1),
+            (rowId + 1) + '' + (colId - 1),
+            (rowId - 1) + '' + (colId - 1),
+            (rowId + 1) + '' + colId,
+            (rowId - 1) + '' + colId
         ];
 
-        newDroppableCells.forEach(cell => {
+        surroundingCells.forEach(cell => {
+
             /**** comprova si la cel·la és a dins de la taula ****/
-            if (cell.charCodeAt(0) >= iniciFiles &&
-                cell.charCodeAt(0) <= iniciFiles + tamany - 1) {
+            console.log(`${cell}`);
+            if (cell[0] >= 0 &&
+                cell[0] <= tamany - 1) {
                 let cellElement = document.getElementById(`${cell}`);
+
+                if (tablero[cell[0]][cell[1]] != 1 && tablero[cell[0]][cell[1]] != 2) {
+                    tablero[cell[0]][cell[1]] = 0;
+                }
+
                 /**** comprova si la cel·la és buida (no té una fitxa ja) ****/
-                if ($(`#${cell}`).children().length == 0) {
+                if (tablero[cell[0]][cell[1]] == 0) {
                     /*$(`#${cell}`).on('drop', drop);
                     $(`#${cell}`).on('dragover', allowDrop);    AMB AIXÒ NO FUNCIONA!!!!!!!!! NOMÉS AMB ADDEVENTLISTENER :(*/
                     cellElement.addEventListener('drop', drop, true);
                     cellElement.addEventListener('dragover', allowDrop, true);
-                } else {
+                } else if (tablero[cell[0]][cell[1]] == 1) {
                     /**** comprova si la cel·la té una fitxa del color contrari ****/
                     console.log(`\n\n\n THIS CELL (${cell}) HAS A DISC\n`);
                     console.log(`DISC COLOR: ${cellElement.children[0].getAttribute('src').includes('negra') ? 'negra' : 'blanca'}\n\n\n`);
+
+                    if (colorFitxa == 2) {
+                        tablero[cell[0]][cell[1]] = 2;
+                        cellElement.children[0].setAttribute('src', '../img/fitxa-negra.png');
+                    }
+                    cellElement.removeEventListener('drop', drop, true);
+                    cellElement.removeEventListener('dragover', allowDrop, true);
+                } else if (tablero[cell[0]][cell[1]] == 2) {
+                    /**** comprova si la cel·la té una fitxa del color contrari ****/
+                    console.log(`\n\n\n THIS CELL (${cell}) HAS A DISC\n`);
+                    console.log(`DISC COLOR: ${cellElement.children[0].getAttribute('src').includes('negra') ? 'negra' : 'blanca'}\n\n\n`);
+
+                    if (colorFitxa == 1) {
+                        tablero[cell[0]][cell[1]] = 1;
+                        cellElement.children[0].setAttribute('src', '../img/fitxa-blanca.png');
+                    }
+
                     cellElement.removeEventListener('drop', drop, true);
                     cellElement.removeEventListener('dragover', allowDrop, true);
                 }
@@ -67,12 +162,25 @@ $().ready(() => {
         
         */
         let coordenadaId = ev.target.id;
+        console.log(`${JSON.stringify(tablero)}`);
 
-        $.post("/moverPieza", { jugador: jugadorId, partida: partidaId, coordenada: coordenadaId }, function() {
 
-        });
+        /*$.post("/moverPieza", { jugador: jugadorId, partida: partidaId, coordenada: coordenadaId }, function() {
+
+        });*/
 
     };
+
+    function regenerarTablero(colorFitxa) {
+        let tableroTemp = tablero;
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                if (tablero[i][j]) {
+
+                }
+            }
+        }
+    }
 
     /**** addEventListeners botons dificultat ****/
     $('#bt-easy').click(() => {
@@ -102,90 +210,8 @@ $().ready(() => {
     });
 
     /**** funció per generar el tauler i les fitxes, donat un tamany ****/
-    let generarTauler = tamany => {
-        let numFitxes = Math.pow(tamany, 2);
-        console.log(
-            `El tamany escollit pel tauler és: ${tamany} x ${tamany} = ${numFitxes}`
-        );
 
-        let fitxesNegresInicials = [
-            `${String.fromCharCode(iniciFiles + tamany / 2) + tamany / 2}`,
-            `${String.fromCharCode(iniciFiles + tamany / 2 - 1) + (tamany / 2 + 1)}`
-        ];
-
-        let fitxesBlanquesInicials = [
-            `${String.fromCharCode(iniciFiles + tamany / 2) + (tamany / 2 + 1)}`,
-            `${String.fromCharCode(iniciFiles + (tamany / 2 - 1)) + tamany / 2}`
-        ];
-
-        let droppableCellsInicials = [
-            `${String.fromCharCode(iniciFiles + tamany / 2 + 1) + (tamany / 2 - 1)}`,
-            `${String.fromCharCode(iniciFiles + tamany / 2 + 1) + tamany / 2}`,
-            `${String.fromCharCode(iniciFiles + tamany / 2) + (tamany / 2 - 1)}`,
-            `${String.fromCharCode(iniciFiles + tamany / 2 - 1) + (tamany / 2 + 2)}`,
-            `${String.fromCharCode(iniciFiles + tamany / 2 - 2) + (tamany / 2 + 1)}`,
-            `${String.fromCharCode(iniciFiles + tamany / 2 - 2) + (tamany / 2 + 2)}`,
-            `${String.fromCharCode(iniciFiles + tamany / 2 + 1) + (tamany / 2 + 1)}`,
-            `${String.fromCharCode(iniciFiles + tamany / 2 + 1) + (tamany / 2 + 2)}`,
-            `${String.fromCharCode(iniciFiles + tamany / 2) + (tamany / 2 + 2)}`,
-            `${String.fromCharCode(iniciFiles + (tamany / 2 - 1)) + (tamany / 2 - 1)}`,
-            `${String.fromCharCode(iniciFiles + (tamany / 2 - 2)) + (tamany / 2 - 1)}`,
-            `${String.fromCharCode(iniciFiles + (tamany / 2 - 2)) + tamany / 2}`
-        ];
-
-        for (let r = iniciFiles; r <= iniciFiles + tamany - 1; r++) {
-            /**** afegeix la fila ****/
-            let row = document.createElement('tr');
-            row.id = `row-${String.fromCharCode(r)}`;
-            $('table')[0].append(row);
-
-            /**** afegeix les columnes a la fila ja inserida ****/
-            for (let c = 1; c <= tamany; c++) {
-                let col = document.createElement('td');
-                col.id = `${String.fromCharCode(r) + c}`;
-                let fitxa = document.createElement('img');
-
-                if (fitxesNegresInicials.includes(col.id)) {
-                    /**** fitxes negres inicials ****/
-                    fitxa.setAttribute('src', '../img/fitxa-negra.png');
-                    fitxa.draggable = false;
-                    col.appendChild(fitxa);
-                } else if (fitxesBlanquesInicials.includes(col.id)) {
-                    /**** fitxes blanques inicials ****/
-                    fitxa.setAttribute('src', '../img/fitxa-blanca.png');
-                    fitxa.draggable = false;
-                    col.appendChild(fitxa);
-                } else if (droppableCellsInicials.includes(col.id)) {
-                    /**** afegeix els eventlisteners de drag&&drop a les columnes que envolten les fitxes ****/
-                    col.addEventListener('drop', drop);
-                    col.addEventListener('dragover', allowDrop);
-                }
-
-                //col.innerText = `${String.fromCharCode(r)+c}`;
-                $(`#row-${String.fromCharCode(r)}`).append(col);
-            }
-        }
-
-
-        /**** afegeix les fitxes de cada jugador ****/
-
-        let fb = document.createElement('img');
-        fb.setAttribute('src', '../img/fitxa-blanca.png');
-        fb.setAttribute('draggable', 'true');
-        fb.id = `b`;
-        //console.log(`FITXA BLANCA DRAG: ${fb.getAttribute('draggable')}`);
-        fb.addEventListener('dragstart', drag);
-        $('.blanques').append(fb);
-
-        let fn = document.createElement('img');
-        fn.setAttribute('src', '../img/fitxa-negra.png');
-        fn.setAttribute('draggable', 'true');
-        fn.id = `n`;
-        //console.log(`FITXA NEGRA DRAG: ${fn.getAttribute('draggable')}`);
-        fn.addEventListener('dragstart', drag);
-        $('.negres').append(fn);
-    };
 
     /**** primera inicialització tauler ****/
-    generarTauler(tamany);
+    generacionTablero();
 });

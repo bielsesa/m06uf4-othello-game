@@ -2,6 +2,7 @@ const querystring = require('querystring');
 const fs = require('fs');
 const path = require('path');
 const Jugador = require('./Jugador');
+const debug = require('./helperFunctions');
 
 const rootPath = './frontend';
 

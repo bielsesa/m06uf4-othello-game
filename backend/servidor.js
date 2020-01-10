@@ -8,6 +8,7 @@ const port = process.argv[2] || 9000;
 
 /* Info de les partides */
 const sales = [{ jugadorN: {}, jugadorB: {} }];
+var userSessions = [];
 
 const iniciar = (encaminar, manegadorPeticions) => {
     const onReq = (req, res) => {
