@@ -12,6 +12,8 @@ $().ready(() => {
         [-1, -1, -1, -1, -1, -1, -1, -1],
         [-1, -1, -1, -1, -1, -1, -1, -1]
     ];
+    
+    let mida = 8;
 
     function generacionTablero() {
 
@@ -68,8 +70,7 @@ $().ready(() => {
             $('.negres').append(fn);
         }
     }
-    let iniciFiles = 65; // LLETRA A
-    let tamany = 8;
+    
 
     /**** funcions drag&drop ****/
     let allowDrop = ev => {
@@ -113,26 +114,24 @@ $().ready(() => {
 
         surroundingCells.forEach(cell => {
 
-            /**** comprova si la cel·la és a dins de la taula ****/
-            console.log(`${cell}`);
+            /**** comprova si la cel·la és a dins del taulell ****/
             if (cell[0] >= 0 &&
-                cell[0] <= tamany - 1) {
+                cell[0] <= mida - 1) {
                 let cellElement = document.getElementById(`${cell}`);
 
                 if (tablero[cell[0]][cell[1]] != 1 && tablero[cell[0]][cell[1]] != 2) {
                     tablero[cell[0]][cell[1]] = 0;
                 }
 
-                /**** comprova si la cel·la és buida (no té una fitxa ja) ****/
+                /**** comprova si la cel·la és buida ****/
                 if (tablero[cell[0]][cell[1]] == 0) {
-                    /*$(`#${cell}`).on('drop', drop);
-                    $(`#${cell}`).on('dragover', allowDrop);    AMB AIXÒ NO FUNCIONA!!!!!!!!! NOMÉS AMB ADDEVENTLISTENER :(*/
+
                     cellElement.addEventListener('drop', drop, true);
                     cellElement.addEventListener('dragover', allowDrop, true);
+
                 } else if (tablero[cell[0]][cell[1]] == 1) {
+
                     /**** comprova si la cel·la té una fitxa del color contrari ****/
-                    console.log(`\n\n\n THIS CELL (${cell}) HAS A DISC\n`);
-                    console.log(`DISC COLOR: ${cellElement.children[0].getAttribute('src').includes('negra') ? 'negra' : 'blanca'}\n\n\n`);
 
                     if (colorFitxa == 2) {
                         tablero[cell[0]][cell[1]] = 2;
@@ -140,6 +139,7 @@ $().ready(() => {
                     }
                     cellElement.removeEventListener('drop', drop, true);
                     cellElement.removeEventListener('dragover', allowDrop, true);
+                    
                 } else if (tablero[cell[0]][cell[1]] == 2) {
                     /**** comprova si la cel·la té una fitxa del color contrari ****/
                     console.log(`\n\n\n THIS CELL (${cell}) HAS A DISC\n`);
@@ -187,16 +187,16 @@ $().ready(() => {
         // neteja el tauler inicial
         $('.othello-board').empty();
         $('.othello-board').html(othelloBoard);
-        tamany = 4;
-        generarTauler(tamany);
+        mida = 4;
+        generarTauler(mida);
     });
 
     $('#bt-normal').click(() => {
         // neteja el tauler inicial
         $('.othello-board').empty();
         $('.othello-board').html(othelloBoard);
-        tamany = 8;
-        generarTauler(tamany);
+        mida = 8;
+        generarTauler(mida);
     });
 
     $('#bt-hard').click(() => {
@@ -205,11 +205,11 @@ $().ready(() => {
         $('.othello-board').html(
             '<div class="fitxes blanques"></div><table></table><div class="fitxes negres"></div>'
         );
-        tamany = 12;
-        generarTauler(tamany);
+        mida = 12;
+        generarTauler(mida);
     });
 
-    /**** funció per generar el tauler i les fitxes, donat un tamany ****/
+    /**** funció per generar el tauler i les fitxes, donat un mida ****/
 
 
     /**** primera inicialització tauler ****/

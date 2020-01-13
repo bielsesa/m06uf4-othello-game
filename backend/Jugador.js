@@ -18,8 +18,6 @@ class Jugador {
                         dadesBd.mongoClient.connect(dadesBd.url, (err, db) => {
                                 if (err) throw err;
 
-                                // const j = { nom: nom, email: email, password: password };
-
                                 db.db(dadesBd.bd)
                                         .collection(dadesBd.jugadorsCollection)
                                         .update(
@@ -49,7 +47,70 @@ class Jugador {
                 }
         }
 
+        get nom () {
+                return this.nom;
+        }
+
+        get email () {
+                return this.email;
+        }
+
+        get password () {
+                return this.password;
+        }
+
+        set nom (nom) {
+                this.nom = nom;
+        }
+
+        set email (email) {
+                this.email = email;
+        }
+
+        set password (password) {
+                this.password = password;
+        }
+
         /* ATENCION IMPORTANT: Los métodos se ponen sin ENCAPSULACION ni FUNCTION */
+        static loginUsuari (usuari, password) {
+                try {
+                        dadesBd.mongoClient.connect(dadesBd.url, (err, db) => {
+                                if (err) throw err;
+
+                                let cursor  = db.db(dadesBd.bd)
+                                        .collection(dadesBd.jugadorsCollection)
+                                        .find(
+                                                {
+                                                        $or: [
+                                                                {'nom' : usuari},
+                                                                {'email' : usuari}
+                                                        ],
+                                                        $and: [
+                                                                { 'password' : password }
+                                                        ]
+                                                }
+                                        );
+                                
+
+                                        cursor.each(function (err, doc) {
+                                                if (doc != null) {
+                                                        console.log(`Usuari: ${doc.nom} Contrasenya: ${doc.password}`);
+                                                        return true;
+                                                }
+                                                else {
+                                                        console.log(`Final`);                                                    
+                                                }
+                                            });
+
+                                db.close();
+                        });
+                } catch (error) {
+                        debug.writeDebug(`URL bases de dades: ${dadesBd.bd}`);
+                        debug.writeDebug(
+                                `Hi ha hagut un error a l'hora d'inserir el jugador a la base de dades.Error: ${error}`
+                        );
+                }
+        }
 }
 
 module.exports = Jugador;

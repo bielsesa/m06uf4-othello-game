@@ -112,16 +112,14 @@ const jquery = res => {
 
 /* consultes ajax */
 const signupUsuari = (res, data) => {
-    console.log('Manegador petició SIGNUP');
     const parsedData = querystring.parse(data); // <-- HACE EL PARSE DE LOS DATOS DEL POST!
-    debug.writeDebug(`Parsed data: ${JSON.stringify(parsedData)}`);
     const { nom } = parsedData.nom;
     const { email } = parsedData.email;
     const { password } = parsedData.password;
     console.log(`Parsed data: 
-        nom = ${parsedData.nom}
-        email = ${parsedData.email}
-        psswd = ${parsedData.password}
+        nom = ${nom}
+        email = ${email}
+        psswd = ${password}
         `);
     const resposta = `<p>Nom: ${nom}</p><p>Email: ${email}</p><p>Password: ${password}</p>`;
 
@@ -132,7 +130,23 @@ const signupUsuari = (res, data) => {
     return res.end(resposta);
 };
 
-const loginUsuari = (res, data) => {};
+const loginUsuari = (res, data) => {
+    const parsedData = querystring.parse(data); // <-- HACE EL PARSE DE LOS DATOS DEL POST!
+    const { usuari } = parsedData.usuari;
+    const { password } = parsedData.password;
+    console.log(`Parsed data: 
+        nom = ${parsedData.usuari}
+        psswd = ${parsedData.password}
+        `);
+    const resposta = `<p>Usuari: ${parsedData.usuari}</p><p>Password: ${parsedData.password}</p>`;
+
+    /* connexió BD i comprovació login */    
+    Jugador.loginUsuari(parsedData.usuari, parsedData.password);
+    console.log(`Jugador: ${JSON.stringify(jugador)}`);
+
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    return res.end(resposta);
+};
 
 /* exports */
 exports.signupUsuari = signupUsuari;
