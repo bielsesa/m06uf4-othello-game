@@ -128,13 +128,24 @@ const signupUsuari = (res, data) => {
 
             db.db(dadesBd.bd)
                 .collection(dadesBd.jugadorsCollection)
-                .update(
-                    { nom: parsedData.nom },
-                    { nom: parsedData.nom, email: parsedData.email, password: parsedData.password },
+                .updateOne(
+                    {
+                        $or: [{ nom: parsedData.nom }, { email: parsedData.email }],
+                    },
+                    {
+                        $setOnInsert: {
+                            nom: parsedData.nom,
+                            email: parsedData.email,
+                            password: parsedData.password,
+                        },
+                    },
                     { upsert: true },
                     (err, dbRes) => {
-                        console.log(`nModified: ${dbRes.result.nModified}.`);
-                        if (dbRes.result.nModified == 0) {
+                        console.log(`Result: ${dbRes}.`);
+                        // if (dbRes != null) console.log(`nModified: ${dbRes.result.nModified}.`);
+                        if (dbRes != null) console.log(`MatchedCount: ${dbRes.matchedCount}.`);
+                        if (err != null) console.log(`Error: ${JSON.stringify(err)}`);
+                        if (dbRes.matchedCount != 0) {
                             console.log(`El jugador ja existeix.`);
                             res.writeHead(200, { 'Content-Type': 'application/json' });
                             return res.end(JSON.stringify({ ok: 0 }));
