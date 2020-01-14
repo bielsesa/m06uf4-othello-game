@@ -9,10 +9,13 @@ const manegadors = {};
 /* consultes ajax */
 manegadors['/signupUsuari'] = manegadorPeticions.signupUsuari;
 manegadors['/loginUsuari'] = manegadorPeticions.loginUsuari;
+manegadors['/tornJugador'] = manegadorPeticions.tornJugador;
+manegadors['/canviaTornJugador'] = manegadorPeticions.canviaTornJugador;
 
 /* arxius estatics */
 manegadors['/'] = manegadorPeticions.index;
 manegadors['/index'] = manegadorPeticions.index;
+manegadors['/js/index.js'] = manegadorPeticions.indexScript;
 manegadors['/signup'] = manegadorPeticions.signup;
 manegadors['/js/signup.js'] = manegadorPeticions.signupScript;
 manegadors['/login'] = manegadorPeticions.login;

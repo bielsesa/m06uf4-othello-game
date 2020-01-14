@@ -26,17 +26,18 @@ $().ready(() => {
 
     const drop = ev => {
         ev.preventDefault();
-        console.log(`Dropped disc at: ${ev.target.id}`);
+
         const data = ev.dataTransfer.getData('fitxa');
+
         // comprova que no hi ha ja una fitxa i després la mou
         if (ev.target.children.length == 0) ev.target.appendChild(document.getElementById(data).cloneNode(true));
         $(`.fitxes #${data}`).remove();
+
         document.getElementById(data).draggable = false; // un cop s'ha deixat la fitxa al tauler ja no es pot moure
 
         /* desactivar drop a les caselles que ho tenen amb fitxa  */
         /* i activar-lo a les caselles que ho tenen sense fitxa  */
 
-        console.log(`${JSON.stringify(data)}`);
         const colorFitxa = data.includes('n') ? 2 : 1;
 
         /* Row i Col on s'ha posat la fitxa  */
@@ -66,7 +67,6 @@ $().ready(() => {
                 if (tauler[row][col] != 1 && tauler[row][col] != 2) {
                     tauler[row][col] = 0;
                 }
-        }
 
                 /* comprova si la cel·la és buida  */
                 if (tauler[row][col] == 0) {
@@ -88,77 +88,15 @@ $().ready(() => {
                         tauler[row][col] = 1;
                         cellElement.children[0].setAttribute('src', '../img/fitxa-blanca.png');
                     }
-
-        function regenerarTablero(colorFitxa) {
-                const tableroTemp = tablero;
-                for (let i = 0; i < 8; i++) {
-                        for (let j = 0; j < 8; j++) {
-                                if (tablero[i][j]) {
-                                }
-                        }
                 }
             }
-        });
-
-        // eslint-disable-next-line no-use-before-define
-        regenerarTauler();
-        /* $.post("/moverPieza", { jugador: jugadorId, partida: partidaId, coordenada: coordenadaId }, function() {
+            // eslint-disable-next-line no-use-before-define
+            regenerarTauler();
+            /* $.post("/moverPieza", { jugador: jugadorId, partida: partidaId, coordenada: coordenadaId }, function() {
 
         }); */
+        });
     };
-
-    function generacionTablero() {
-        const board = document.getElementById('board');
-        for (let i = 0; i < 8; i++) {
-            const row = board.insertRow(i);
-            // const row = document.createElement('tr');
-            row.id = i;
-            // $('table')[0].append(row);
-
-            for (let j = 0; j < 8; j++) {
-                // const col = document.createElement('td');
-                const col = row.insertCell(j);
-                col.id = `${i}${j}`;
-                const fitxa = document.createElement('img');
-
-                if (tauler[i][j] === 2) {
-                    /* fitxes negres inicials  */
-                    fitxa.setAttribute('src', '../img/fitxa-negra.png');
-                    fitxa.draggable = false;
-                    col.appendChild(fitxa);
-                } else if (tauler[i][j] === 1) {
-                    /* fitxes blanques inicials  */
-                    fitxa.setAttribute('src', '../img/fitxa-blanca.png');
-                    fitxa.draggable = false;
-                    col.appendChild(fitxa);
-                } else if (tauler[i][j] === 0) {
-                    /* afegeix els eventlisteners de drag&&drop a les columnes que envolten les fitxes  */
-                    col.addEventListener('drop', drop);
-                    col.addEventListener('dragover', allowDrop);
-                }
-
-                // col.innerText = `${String.fromCharCode(r)+c}`;
-                $(`tr#${i}`).append(col);
-            }
-
-            /* afegeix les fitxes de cada jugador */
-
-            const fb = document.createElement('img');
-            fb.setAttribute('src', '../img/fitxa-blanca.png');
-            fb.setAttribute('draggable', 'true');
-            fb.id = `b`;
-            fb.addEventListener('dragstart', drag);
-            $('.blanques').append(fb);
-
-            const fn = document.createElement('img');
-            fn.setAttribute('src', '../img/fitxa-negra.png');
-            fn.setAttribute('draggable', 'true');
-            fn.id = `n`;
-            fn.addEventListener('dragstart', drag);
-            $('.negres').append(fn);
-        }
-    }
-
     /* funcions per generar el tauler i les fitxes */
 
     const generarFitxesJugador = () => {
@@ -216,4 +154,22 @@ $().ready(() => {
     // generacionTablero();
     regenerarTauler();
     generarFitxesJugador();
+
+    const interval = setInterval(() => {
+        $.ajax({
+            url: '/tornJugador',
+            type: 'GET',
+            dataType: 'application/json',
+            complete: (result, status, xhr) => {
+                const data = JSON.parse(result.responseText);
+                console.log(`Torn: ${data.torn}`);
+                if (data.torn == 'n') {
+                    $('#negres').toggleClass('disabled');
+                } else if (data.torn == 'b') {
+                    // document.getElementsByClassName('negres')[0].innerHTML = '<p>Registre incorrecte</p>';
+                    $('#negres').toggleClass('disabled');
+                }
+            },
+        });
+    }, 3000);
 });

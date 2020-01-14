@@ -1,4 +1,12 @@
 $().ready(() => {
+    /* comprovació usuari loggejat */
+    const usuari = localStorage.key('usuari');
+
+    if (usuari != null) {
+        /* usuari loggejat */
+        window.location.replace('/joc');
+    }
+
     $('#username').bind('keyup', e => {
         // CONSULTA AJAX PER MIRAR SI EL USERNAME JA ESTÀ AGAFAT
     });

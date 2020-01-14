@@ -2,10 +2,11 @@
 const querystring = require('querystring');
 const fs = require('fs');
 const path = require('path');
-const Jugador = require('./Jugador');
 const dadesBd = require('./dadesbd');
 
 const rootPath = './frontend';
+
+let torn = 'b';
 
 const mimeType = {
     '.ico': 'image/x-icon',
@@ -62,12 +63,31 @@ const moureFitxa = (res, postData) => {
     res = { tipus: 'pasaTorn', jugadorId: jugadorId, salaId: salaId };
 };
 
+const tornJugador = res => {
+    console.log(`Torn: ${torn}`);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ torn: torn }));
+};
+
+const canviaTornJugador = (res, data) => {
+    const parsedData = querystring.parse(data);
+    // eslint-disable-next-line prefer-destructuring
+    torn = parsedData.torn;
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ torn: torn }));
+};
+
 // const iniciarPartida = res => 'iniciar partida';
 
 /* arxius estatics */
 
 const index = res => {
     sendFile(res, `${rootPath}/index.html`);
+};
+
+const indexScript = res => {
+    sendFile(res, `${rootPath}/js/index.js`);
 };
 
 const signup = res => {
@@ -215,8 +235,11 @@ const loginUsuari = (res, data) => {
 /* exports */
 exports.signupUsuari = signupUsuari;
 exports.loginUsuari = loginUsuari;
+exports.tornJugador = tornJugador;
+exports.canviaTornJugador = canviaTornJugador;
 
 exports.index = index;
+exports.indexScript = indexScript;
 exports.signup = signup;
 exports.signupScript = signupScript;
 exports.login = login;
