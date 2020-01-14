@@ -47,60 +47,51 @@ class Jugador {
                 }
         }
 
-        get nom () {
+        get nom() {
                 return this.nom;
         }
 
-        get email () {
+        get email() {
                 return this.email;
         }
 
-        get password () {
+        get password() {
                 return this.password;
         }
 
-        set nom (nom) {
+        set nom(nom) {
                 this.nom = nom;
         }
 
-        set email (email) {
+        set email(email) {
                 this.email = email;
         }
 
-        set password (password) {
+        set password(password) {
                 this.password = password;
         }
 
         /* ATENCION IMPORTANT: Los métodos se ponen sin ENCAPSULACION ni FUNCTION */
-        static loginUsuari (usuari, password) {
+        static loginUsuari(usuari, password) {
                 try {
                         dadesBd.mongoClient.connect(dadesBd.url, (err, db) => {
                                 if (err) throw err;
 
-                                let cursor  = db.db(dadesBd.bd)
+                                const cursor = db
+                                        .db(dadesBd.bd)
                                         .collection(dadesBd.jugadorsCollection)
-                                        .find(
-                                                {
-                                                        $or: [
-                                                                {'nom' : usuari},
-                                                                {'email' : usuari}
-                                                        ],
-                                                        $and: [
-                                                                { 'password' : password }
-                                                        ]
-                                                }
-                                        );
-                                
+                                        .find({
+                                                $or: [{ nom: usuari }, { email: usuari }],
+                                                $and: [{ password: password }],
+                                        });
 
-                                        cursor.each(function (err, doc) {
-                                                if (doc != null) {
-                                                        console.log(`Usuari: ${doc.nom} Contrasenya: ${doc.password}`);
-                                                        return true;
-                                                }
-                                                else {
-                                                        console.log(`Final`);                                                    
-                                                }
-                                            });
+                                cursor.each(function(err, doc) {
+                                        if (doc != null) {
+                                                console.log(`Usuari: ${doc.nom} Contrasenya: ${doc.password}`);
+                                                return true;
+                                        }
+                                        console.log(`Final`);
+                                });
 
                                 db.close();
                         });
