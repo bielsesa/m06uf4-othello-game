@@ -1,8 +1,9 @@
+/* eslint-disable no-param-reassign */
 const querystring = require('querystring');
 const fs = require('fs');
 const path = require('path');
 const Jugador = require('./Jugador');
-const debug = require('./helperFunctions');
+const dadesBd = require('./dadesbd');
 
 const rootPath = './frontend';
 
@@ -54,14 +55,14 @@ const sendFile = (res, pathname) => {
     });
 };
 
-const mourePieza = (res, postData) => {
-    var jugadorId = postData.jugadorId;
-    var salaId = postData.salaId;
+const moureFitxa = (res, postData) => {
+    const { jugadorId } = postData;
+    const { salaId } = postData;
 
-    res = { tipus: 'pasaTorn', 'jugadorId': jugadorId, 'salaId': salaId };
-}
+    res = { tipus: 'pasaTorn', jugadorId: jugadorId, salaId: salaId };
+};
 
-//const iniciarPartida = res => 'iniciar partida';
+// const iniciarPartida = res => 'iniciar partida';
 
 /* arxius estatics */
 
@@ -132,20 +133,42 @@ const signupUsuari = (res, data) => {
 
 const loginUsuari = (res, data) => {
     const parsedData = querystring.parse(data); // <-- HACE EL PARSE DE LOS DATOS DEL POST!
-    const { usuari } = parsedData.usuari;
-    const { password } = parsedData.password;
     console.log(`Parsed data: 
         nom = ${parsedData.usuari}
         psswd = ${parsedData.password}
         `);
-    const resposta = `<p>Usuari: ${parsedData.usuari}</p><p>Password: ${parsedData.password}</p>`;
 
-    /* connexió BD i comprovació login */    
+    /* connexió BD i comprovació login */
+
     Jugador.loginUsuari(parsedData.usuari, parsedData.password);
-    console.log(`Jugador: ${JSON.stringify(jugador)}`);
+    try {
+        dadesBd.mongoClient.connect(dadesBd.url, (err, db) => {
+            if (err) throw err;
 
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    return res.end(resposta);
+            const cursor = db
+                .db(dadesBd.bd)
+                .collection(dadesBd.jugadorsCollection)
+                .find({
+                    $or: [{ nom: parsedData.usuari }, { email: parsedData.usuari }],
+                    $and: [{ password: parsedData.password }],
+                });
+
+            cursor.each(function(err, doc) {
+                if (doc != null) {
+                    console.log(`Usuari: ${doc.nom} Contrasenya: ${doc.password}`);
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    return res.end(JSON.stringify({ ok: 1, usuari: doc.nom, password: doc.password }));
+                }
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                return res.end(JSON.stringify({ ok: 0 }));
+            });
+
+            db.close();
+        });
+    } catch (error) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        return res.end('Error intern del servidor');
+    }
 };
 
 /* exports */
