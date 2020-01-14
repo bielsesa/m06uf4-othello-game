@@ -12,13 +12,13 @@ $().ready(() => {
         [-1, -1, -1, -1, -1, -1, -1, -1],
         [-1, -1, -1, -1, -1, -1, -1, -1]
     ];
-    
+
     let mida = 8;
 
     function generacionTablero() {
 
         for (let i = 0; i < 8; i++) {
-            let row = document.createElement('tr');
+            const row = document.createElement('tr');
             row.id = i;
             $('table')[0].append(row);
 
