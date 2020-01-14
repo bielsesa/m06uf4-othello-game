@@ -14,16 +14,11 @@ $().ready(() => {
             },
             dataType: 'application/json',
             complete: (result, status, xhr) => {
-                console.log(`Result: ${JSON.stringify(result)}`);
-                console.log(`OK: ${result.ok}`);
-                if (result.responseText.ok == '1') {
-                    document.getElementById('info').innerHTML = '<p>Login correcte</p>';
-                    $('#info').html('<p>Login correcte</p>');
-                    console.log('Login correcte');
-                } else if (result.responseText.ok == '0') {
-                    document.getElementById('info').innerHTML = '<p>Login incorrecte</p>';
-                    $('#info').html('<p>Login incorrecte</p>');
-                    console.log('Login incorrecte');
+                const data = JSON.parse(result.responseText);
+                if (data.ok == '1') {
+                    document.getElementsByClassName('centre')[0].innerHTML = '<p>Login correcte</p>';
+                } else if (data.ok == '0') {
+                    document.getElementsByClassName('centre')[0].innerHTML = '<p>Login incorrecte</p>';
                 }
             },
         });

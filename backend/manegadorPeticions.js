@@ -114,21 +114,53 @@ const jquery = res => {
 /* consultes ajax */
 const signupUsuari = (res, data) => {
     const parsedData = querystring.parse(data); // <-- HACE EL PARSE DE LOS DATOS DEL POST!
-    const { nom } = parsedData.nom;
-    const { email } = parsedData.email;
-    const { password } = parsedData.password;
     console.log(`Parsed data: 
-        nom = ${nom}
-        email = ${email}
-        psswd = ${password}
+        nom = ${parsedData.nom}
+        email = ${parsedData.email}
+        psswd = ${parsedData.password}
         `);
-    const resposta = `<p>Nom: ${nom}</p><p>Email: ${email}</p><p>Password: ${password}</p>`;
 
     /* connexió BD i registre */
-    const nouJugador = new Jugador(parsedData.nom, parsedData.email, parsedData.password);
+    // const nouJugador = new Jugador(parsedData.nom, parsedData.email, parsedData.password);
+    try {
+        dadesBd.mongoClient.connect(dadesBd.url, (err, db) => {
+            if (err) throw err;
 
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    return res.end(resposta);
+            db.db(dadesBd.bd)
+                .collection(dadesBd.jugadorsCollection)
+                .update(
+                    { nom: parsedData.nom },
+                    { nom: parsedData.nom, email: parsedData.email, password: parsedData.password },
+                    { upsert: true },
+                    (err, dbRes) => {
+                        console.log(`nModified: ${dbRes.result.nModified}.`);
+                        if (dbRes.result.nModified == 0) {
+                            console.log(`El jugador ja existeix.`);
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            return res.end(JSON.stringify({ ok: 0 }));
+                        }
+                        console.log(`Jugador nou registrat.`);
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        return res.end(
+                            JSON.stringify({
+                                ok: 1,
+                                nom: parsedData.nom,
+                                email: parsedData.email,
+                                password: parsedData.password,
+                            })
+                        );
+                    }
+                );
+            // UPSERT serveix per actualitzar si ja existeix, o inserir nou si no
+            // d'aquesta manera nosaltres assegurem que no s'insereix un jugador si ja existeix
+            // TODO si el jugador ja existeix, avisar de que existeix!
+
+            db.close();
+        });
+    } catch (error) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        return res.end('Error intern del servidor');
+    }
 };
 
 const loginUsuari = (res, data) => {
@@ -139,8 +171,6 @@ const loginUsuari = (res, data) => {
         `);
 
     /* connexió BD i comprovació login */
-
-    Jugador.loginUsuari(parsedData.usuari, parsedData.password);
     try {
         dadesBd.mongoClient.connect(dadesBd.url, (err, db) => {
             if (err) throw err;
