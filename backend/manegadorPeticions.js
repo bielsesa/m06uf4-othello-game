@@ -8,7 +8,7 @@ const Jugador = require('./Jugador');
 
 const rootPath = './frontend';
 
-let torn = 'b';
+let torn = 'n';
 const partides = [];
 
 const mimeType = {
