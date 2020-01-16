@@ -2,6 +2,29 @@
 $().ready(() => {
     // Guardar el id del jugador aquí para enviarlo en el POST del AJAX
     // Guardar el id de la sala
+    const nomSala = prompt('Escriu el nom de la sala');
+
+    $.ajax({
+        url: '/iniciaPartida',
+        type: 'POST',
+        contentType: 'application/json',
+        data: {
+            usuari: `${localStorage.getItem('usuari')}`,
+            nomSala: nomSala,
+        },
+        dataType: 'application/json',
+        complete: (result, status, xhr) => {
+            const data = JSON.parse(result.responseText);
+            console.log(`Fitxes: ${data.fitxes}`);
+            if (data.ok == 0) {
+                window.alert('Aquesta sala ja està plena!');
+                window.location.replace('/');
+            } else if (data.ok == 1) {
+                // eslint-disable-next-line no-use-before-define
+                generarFitxesJugadorColor(data.fitxes);
+            }
+        },
+    });
 
     const tauler = [
         [-1, -1, -1, -1, -1, -1, -1, -1],
@@ -119,6 +142,31 @@ $().ready(() => {
         }
     };
 
+    const generarFitxesJugadorColor = fitxes => {
+        /* afegeix les fitxes de cada jugador */
+
+        for (let i = 0; i < 30; i++) {
+            let src = '';
+            let classe = '';
+            if (fitxes == 'n') {
+                src = '../img/fitxa-negra.png';
+                classe = '.negres';
+                document.getElementById('blanques').style.visibility = 'collapse';
+            } else if (fitxes == 'b') {
+                src = '../img/fitxa-blanca.png';
+                classe = '.blanques';
+                document.getElementById('negres').style.visibility = 'collapse';
+            }
+            const f = document.createElement('img');
+            f.setAttribute('src', src);
+            f.setAttribute('draggable', 'true');
+            f.id = `${fitxes + i}`;
+            f.addEventListener('dragstart', drag);
+
+            $(classe).append(f);
+        }
+    };
+
     const regenerarTauler = () => {
         const board = document.getElementById('board');
         board.innerHTML = '';
@@ -153,7 +201,7 @@ $().ready(() => {
     /* primera inicialització tauler  */
     // generacionTablero();
     regenerarTauler();
-    generarFitxesJugador();
+    // generarFitxesJugador();
 
     const interval = setInterval(() => {
         $.ajax({

@@ -4,11 +4,10 @@ const manegadorPeticions = require('./manegadorPeticions');
 
 const manegadors = {};
 
-// CONSULTAR SERGI: les variables per guardar info del servidor, millor al index.js o al server.js?
-
 /* consultes ajax */
 manegadors['/signupUsuari'] = manegadorPeticions.signupUsuari;
 manegadors['/loginUsuari'] = manegadorPeticions.loginUsuari;
+manegadors['/iniciaPartida'] = manegadorPeticions.iniciaPartida;
 manegadors['/tornJugador'] = manegadorPeticions.tornJugador;
 manegadors['/canviaTornJugador'] = manegadorPeticions.canviaTornJugador;
 

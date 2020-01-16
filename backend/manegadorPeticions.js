@@ -3,10 +3,13 @@ const querystring = require('querystring');
 const fs = require('fs');
 const path = require('path');
 const dadesBd = require('./dadesbd');
+const Partida = require('./Partida');
+const Jugador = require('./Jugador');
 
 const rootPath = './frontend';
 
 let torn = 'b';
+const partides = [];
 
 const mimeType = {
     '.ico': 'image/x-icon',
@@ -54,6 +57,33 @@ const sendFile = (res, pathname) => {
             return res.end(data);
         });
     });
+};
+
+const iniciaPartida = (res, data) => {
+    const parsedData = querystring.parse(data);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+
+    console.log(`Nom sala: ${parsedData.nomSala}`);
+
+    const partidaExisteix = partides.filter(partida => partida.id == parsedData.nomSala)[0];
+
+    if (partidaExisteix != undefined) {
+        console.log('Partida existeix');
+        const jugadorBlanquesExisteix = partidaExisteix.jugadorBlanques;
+        if (jugadorBlanquesExisteix == undefined) {
+            partidaExisteix.jugadorBlanques = new Jugador(parsedData.usuari);
+            console.log('Jugador blanques ha entrat');
+
+            return res.end(JSON.stringify({ ok: 1, fitxes: 'b' }));
+        }
+        console.log('La sala ja està plena');
+        return res.end(JSON.stringify({ ok: 0 }));
+    }
+    const novaPartida = new Partida(parsedData.nomSala);
+    novaPartida.jugadorNegres = new Jugador(parsedData.usuari);
+    partides.push(novaPartida);
+    console.log('Jugador negres ha entrat');
+    return res.end(JSON.stringify({ ok: 1, fitxes: 'n' }));
 };
 
 const moureFitxa = (res, postData) => {
@@ -235,6 +265,7 @@ const loginUsuari = (res, data) => {
 /* exports */
 exports.signupUsuari = signupUsuari;
 exports.loginUsuari = loginUsuari;
+exports.iniciaPartida = iniciaPartida;
 exports.tornJugador = tornJugador;
 exports.canviaTornJugador = canviaTornJugador;
 
