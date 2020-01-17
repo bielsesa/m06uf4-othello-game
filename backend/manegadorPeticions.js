@@ -94,7 +94,6 @@ const moureFitxa = (res, postData) => {
 };
 
 const tornJugador = res => {
-    console.log(`Torn: ${torn}`);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ torn: torn }));
 };
@@ -103,6 +102,7 @@ const canviaTornJugador = (res, data) => {
     const parsedData = querystring.parse(data);
     // eslint-disable-next-line prefer-destructuring
     torn = parsedData.torn;
+    console.log(`!!!!!!!!!!!!! SE HA CAMBIADO EL TURNO: ${parsedData.torn}`);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ torn: torn }));

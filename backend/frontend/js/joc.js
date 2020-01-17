@@ -1,10 +1,22 @@
 /* eslint-disable no-plusplus */
+
 $().ready(() => {
     // Guardar el id del jugador aquí para enviarlo en el POST del AJAX
     // Guardar el id de la sala
+
     const nomSala = prompt('Escriu el nom de la sala');
-    let torn = '';
+    let torn = 'n';
     let jugador = '';
+    let isPaused = false;
+
+    $(document).ajaxComplete(function(event, xhr, settings) {
+        if (settings.url === '/canviaTornJugador') {
+            console.log(`Triggered ajaxComplete handler. The result is ${xhr.responseText}`);
+
+            console.log(`isPaused: ${isPaused}`);
+            isPaused = false;
+        }
+    });
 
     $.ajax({
         url: '/iniciaPartida',
@@ -24,7 +36,6 @@ $().ready(() => {
             } else if (data.ok == 1) {
                 // eslint-disable-next-line no-use-before-define
                 generarFitxesJugadorColor(data.fitxes);
-                torn = 'n';
                 jugador = data.fitxes;
             }
         },
@@ -53,6 +64,7 @@ $().ready(() => {
 
     const drop = ev => {
         ev.preventDefault();
+        isPaused = true;
 
         const data = ev.dataTransfer.getData('fitxa');
 
@@ -119,13 +131,16 @@ $().ready(() => {
             }
         });
 
-        if (torn == 'n') torn = 'b';
-        else if (torn == 'b') torn = 'n';
-
-        console.log(`Després de DROP, torn: ${torn}`);
+        console.log(`Drop TORN ABANS: ${torn}`);
 
         // eslint-disable-next-line no-use-before-define
         regenerarTauler();
+
+        if (torn == 'n') torn = 'b';
+        else if (torn == 'b') torn = 'n';
+        $('.fitxes').addClass('disabled');
+
+        console.log(`Drop TORN DESPRÉS: ${torn}`);
 
         $.ajax({
             url: '/canviaTornJugador',
@@ -133,9 +148,6 @@ $().ready(() => {
             contentType: 'application/json',
             data: {
                 torn: `${torn}`,
-            },
-            complete: () => {
-                $('.fitxes').addClass('disabled');
             },
         });
     };
@@ -202,17 +214,22 @@ $().ready(() => {
     regenerarTauler();
 
     const interval = setInterval(() => {
-        $.ajax({
-            url: '/tornJugador',
-            type: 'GET',
-            dataType: 'application/json',
-            complete: (result, status, xhr) => {
-                const data = JSON.parse(result.responseText);
-                console.log(`Comprova torn: ${data.torn}`);
-                if (jugador == data.torn) {
-                    $('.fitxes').removeClass('disabled');
-                }
-            },
-        });
+        console.log(`IS PAUSED: ${isPaused}`);
+        if (!isPaused) {
+            $.ajax({
+                url: '/tornJugador',
+                type: 'GET',
+                dataType: 'application/json',
+                complete: (result, status, xhr) => {
+                    const data = JSON.parse(result.responseText);
+                    torn = data.torn;
+                    if (jugador == data.torn) {
+                        $('.fitxes').removeClass('disabled');
+                    } else {
+                        $('.fitxes').addClass('disabled');
+                    }
+                },
+            });
+        }
     }, 500);
 });
