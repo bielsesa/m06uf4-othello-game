@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-plusplus */
 
 $().ready(() => {
@@ -8,6 +9,16 @@ $().ready(() => {
     let torn = 'n';
     let jugador = '';
     let isPaused = false;
+    let tauler = [
+        [-1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, 0, 0, 0, 0, -1, -1],
+        [-1, -1, 0, 1, 2, 0, -1, -1],
+        [-1, -1, 0, 2, 1, 0, -1, -1],
+        [-1, -1, 0, 0, 0, 0, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1],
+    ];
 
     $(document).ajaxComplete(function(event, xhr, settings) {
         if (settings.url === '/canviaTornJugador') {
@@ -40,17 +51,6 @@ $().ready(() => {
             }
         },
     });
-
-    const tauler = [
-        [-1, -1, -1, -1, -1, -1, -1, -1],
-        [-1, -1, -1, -1, -1, -1, -1, -1],
-        [-1, -1, 0, 0, 0, 0, -1, -1],
-        [-1, -1, 0, 1, 2, 0, -1, -1],
-        [-1, -1, 0, 2, 1, 0, -1, -1],
-        [-1, -1, 0, 0, 0, 0, -1, -1],
-        [-1, -1, -1, -1, -1, -1, -1, -1],
-        [-1, -1, -1, -1, -1, -1, -1, -1],
-    ];
 
     /* funcions drag&drop  */
     const allowDrop = ev => {
@@ -131,8 +131,6 @@ $().ready(() => {
             }
         });
 
-        console.log(`Drop TORN ABANS: ${torn}`);
-
         // eslint-disable-next-line no-use-before-define
         regenerarTauler();
 
@@ -140,14 +138,14 @@ $().ready(() => {
         else if (torn == 'b') torn = 'n';
         $('.fitxes').addClass('disabled');
 
-        console.log(`Drop TORN DESPRÉS: ${torn}`);
-
         $.ajax({
             url: '/canviaTornJugador',
             type: 'POST',
             contentType: 'application/json',
             data: {
                 torn: `${torn}`,
+                tauler: tauler,
+                nomSala: `${nomSala}`,
             },
         });
     };
@@ -181,6 +179,7 @@ $().ready(() => {
     const regenerarTauler = () => {
         const board = document.getElementById('board');
         board.innerHTML = '';
+        console.log(`REGENERACIÓ TAULER: ${tauler}`);
         for (let i = 0; i < 8; i++) {
             const row = board.insertRow(i);
             row.id = i;
@@ -188,6 +187,7 @@ $().ready(() => {
                 const cell = row.insertCell(j);
                 cell.id = `${i}${j}`;
 
+                console.log(JSON.stringify(tauler[i][j]));
                 if (tauler[i][j] == 0) {
                     /* afegeix els eventlisteners de drag&&drop a les columnes que envolten les fitxes  */
                     cell.addEventListener('drop', drop);
@@ -208,26 +208,32 @@ $().ready(() => {
             }
         }
     };
-
     /* primera inicialització tauler  */
-    // generacionTablero();
     regenerarTauler();
 
     const interval = setInterval(() => {
-        console.log(`IS PAUSED: ${isPaused}`);
         if (!isPaused) {
             $.ajax({
                 url: '/tornJugador',
-                type: 'GET',
+                type: 'POST',
+                contentType: 'application/json',
+                data: {
+                    nomSala: `${nomSala}`,
+                },
                 dataType: 'application/json',
                 complete: (result, status, xhr) => {
                     const data = JSON.parse(result.responseText);
                     torn = data.torn;
+                    console.log(`TAULER: ${JSON.stringify(data.tauler)}`);
+
+                    // tauler = listToMatrix(data.tauler, 8);
+                    tauler = data.tauler;
                     if (jugador == data.torn) {
                         $('.fitxes').removeClass('disabled');
                     } else {
                         $('.fitxes').addClass('disabled');
                     }
+                    regenerarTauler();
                 },
             });
         }

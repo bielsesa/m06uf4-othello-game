@@ -1,5 +1,5 @@
 const writeDebug = msg => {
-        const now = new Date();
+    const now = new Date();
         console.log(`[${now.toTimeString().split(' ')[0]}] ${msg}`); // eslint-disable-line
 };
 

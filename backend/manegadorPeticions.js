@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 const querystring = require('querystring');
 const fs = require('fs');
@@ -10,6 +11,16 @@ const rootPath = './frontend';
 
 let torn = 'n';
 const partides = [];
+const tauler = [
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, 0, 0, 0, 0, -1, -1],
+    [-1, -1, 0, 1, 2, 0, -1, -1],
+    [-1, -1, 0, 2, 1, 0, -1, -1],
+    [-1, -1, 0, 0, 0, 0, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+];
 
 const mimeType = {
     '.ico': 'image/x-icon',
@@ -30,8 +41,6 @@ const mimeType = {
 
 /* funció lectura arxius */
 const sendFile = (res, pathname) => {
-    console.log(`PATHNAME: ${pathname}`);
-
     fs.exists(pathname, exist => {
         if (!exist) {
             // if the file is not found, return 404
@@ -93,16 +102,24 @@ const moureFitxa = (res, postData) => {
     res = { tipus: 'pasaTorn', jugadorId: jugadorId, salaId: salaId };
 };
 
-const tornJugador = res => {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({ torn: torn }));
+const tornJugador = (res, data) => {
+    const partida = partides.filter(p => p.id == querystring.parse(data).nomSala)[0];
+
+    if (partida != undefined) {
+        console.log(`TAULER: ${partida.tauler[0]}\nTYPE: ${typeof tauler}`);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ torn: torn, tauler: partida.tauler }));
+    }
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    return res.end("No s'ha trobat la partida");
 };
 
 const canviaTornJugador = (res, data) => {
     const parsedData = querystring.parse(data);
-    // eslint-disable-next-line prefer-destructuring
+    console.log(`${parsedData.tauler}`);
+
     torn = parsedData.torn;
-    console.log(`!!!!!!!!!!!!! SE HA CAMBIADO EL TURNO: ${parsedData.torn}`);
+    partides.filter(partida => partida.id == parsedData.nomSala)[0].tauler = parsedData.tauler;
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ torn: torn }));

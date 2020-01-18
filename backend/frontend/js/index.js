@@ -4,7 +4,8 @@ $().ready(() => {
 
     if (usuari != null) {
         /* usuari loggejat */
-        console.log('loggejat');
-        $('#joc').toggleClass('disabled');
+        $('#joc').removeClass('disabled');
+        $('#signup').addClass('disabled');
+        $('#login').addClass('disabled');
     }
 });
