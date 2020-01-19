@@ -10,6 +10,7 @@ manegadors['/loginUsuari'] = manegadorPeticions.loginUsuari;
 manegadors['/iniciaPartida'] = manegadorPeticions.iniciaPartida;
 manegadors['/tornJugador'] = manegadorPeticions.tornJugador;
 manegadors['/canviaTornJugador'] = manegadorPeticions.canviaTornJugador;
+manegadors['/getTopPuntuacions'] = manegadorPeticions.getTopPuntuacions;
 
 /* arxius estatics */
 manegadors['/'] = manegadorPeticions.index;

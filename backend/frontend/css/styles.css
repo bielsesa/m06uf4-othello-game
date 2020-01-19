@@ -56,4 +56,14 @@ td:nth-child(odd) {
   visibility: collapse;
 }
 
+.content {
+  margin: 15px auto;
+  width: 50%;
+}
+
 /************** IDENTIFIER SELECTORS **************/
+
+#puntuactions {
+  border: solid 1px grey;
+  border-radius: 20px;
+}

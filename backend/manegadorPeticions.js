@@ -317,6 +317,29 @@ const finalitzaPartida = (res, data) => {
     }
 };
 
+const getTopPuntuacions = res => {
+    try {
+        dadesBd.mongoClient.connect(dadesBd.url, (err, db) => {
+            if (err) throw err;
+
+            const topPuntuacions = [];
+
+            db.db(dadesBd.bd)
+                .collection(dadesBd.jugadorsCollection)
+                .find()
+                .sort({ puntuacions: -1 })
+                .each(doc => {
+                    topPuntuacions.add(doc.puntuacions);
+                });
+
+            db.close();
+        });
+    } catch (error) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        return res.end('Error intern del servidor');
+    }
+};
+
 /* exports */
 exports.signupUsuari = signupUsuari;
 exports.loginUsuari = loginUsuari;

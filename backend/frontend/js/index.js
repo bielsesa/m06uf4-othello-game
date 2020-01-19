@@ -8,4 +8,11 @@ $().ready(() => {
         $('#signup').addClass('disabled');
         $('#login').addClass('disabled');
     }
+
+    // $.get('/getTopPuntuacions', data => {
+    //     const parsedData = JSON.parse(data);
+    //     const taulaPunts = document.getElementById('puntuacions');
+
+    //     parsedData.array.forEach(element => {});
+    // });
 });
