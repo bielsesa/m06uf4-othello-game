@@ -68,65 +68,6 @@ const sendFile = (res, pathname) => {
     });
 };
 
-const iniciaPartida = (res, data) => {
-    const parsedData = querystring.parse(data);
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-
-    console.log(`Nom sala: ${parsedData.nomSala}`);
-
-    const partidaExisteix = partides.filter(partida => partida.id == parsedData.nomSala)[0];
-
-    if (partidaExisteix != undefined) {
-        console.log('Partida existeix');
-        const jugadorBlanquesExisteix = partidaExisteix.jugadorBlanques;
-        if (jugadorBlanquesExisteix == undefined) {
-            partidaExisteix.jugadorBlanques = new Jugador(parsedData.usuari);
-            console.log('Jugador blanques ha entrat');
-
-            return res.end(JSON.stringify({ ok: 1, fitxes: 'b' }));
-        }
-        console.log('La sala ja està plena');
-        return res.end(JSON.stringify({ ok: 0 }));
-    }
-    const novaPartida = new Partida(parsedData.nomSala);
-    novaPartida.jugadorNegres = new Jugador(parsedData.usuari);
-    partides.push(novaPartida);
-    console.log('Jugador negres ha entrat');
-    return res.end(JSON.stringify({ ok: 1, fitxes: 'n' }));
-};
-
-const moureFitxa = (res, postData) => {
-    const { jugadorId } = postData;
-    const { salaId } = postData;
-
-    res = { tipus: 'pasaTorn', jugadorId: jugadorId, salaId: salaId };
-};
-
-const tornJugador = (res, data) => {
-    const partida = partides.filter(p => p.id == querystring.parse(data).nomSala)[0];
-
-    if (partida != undefined) {
-        console.log(`TAULER: ${partida.tauler[0]}\nTYPE: ${typeof tauler}`);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ torn: torn, tauler: partida.tauler }));
-    }
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    return res.end("No s'ha trobat la partida");
-};
-
-const canviaTornJugador = (res, data) => {
-    const parsedData = querystring.parse(data);
-    console.log(`${parsedData.tauler}`);
-
-    torn = parsedData.torn;
-    partides.filter(partida => partida.id == parsedData.nomSala)[0].tauler = parsedData.tauler;
-
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({ torn: torn }));
-};
-
-// const iniciarPartida = res => 'iniciar partida';
-
 /* arxius estatics */
 
 const index = res => {
@@ -273,6 +214,103 @@ const loginUsuari = (res, data) => {
 
             db.close();
         });
+    } catch (error) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        return res.end('Error intern del servidor');
+    }
+};
+
+const iniciaPartida = (res, data) => {
+    const parsedData = querystring.parse(data);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+
+    console.log(`Nom sala: ${parsedData.nomSala}`);
+
+    const partidaExisteix = partides.filter(partida => partida.id == parsedData.nomSala)[0];
+
+    if (partidaExisteix != undefined) {
+        console.log('Partida existeix');
+        const jugadorBlanquesExisteix = partidaExisteix.jugadorBlanques;
+        if (jugadorBlanquesExisteix == undefined) {
+            partidaExisteix.jugadorBlanques = new Jugador(parsedData.usuari);
+            console.log('Jugador blanques ha entrat');
+
+            return res.end(JSON.stringify({ ok: 1, fitxes: 'b' }));
+        }
+        console.log('La sala ja està plena');
+        return res.end(JSON.stringify({ ok: 0 }));
+    }
+    const novaPartida = new Partida(parsedData.nomSala);
+    novaPartida.jugadorNegres = new Jugador(parsedData.usuari);
+    partides.push(novaPartida);
+    console.log('Jugador negres ha entrat');
+    return res.end(JSON.stringify({ ok: 1, fitxes: 'n' }));
+};
+
+const moureFitxa = (res, postData) => {
+    const { jugadorId } = postData;
+    const { salaId } = postData;
+
+    res = { tipus: 'pasaTorn', jugadorId: jugadorId, salaId: salaId };
+};
+
+const tornJugador = (res, data) => {
+    const partida = partides.filter(p => p.id == querystring.parse(data).nomSala)[0];
+
+    if (partida != undefined) {
+        console.log(`TAULER: ${partida.tauler[0]}\nTYPE: ${typeof tauler}`);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ torn: torn, tauler: partida.tauler }));
+    }
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    return res.end("No s'ha trobat la partida");
+};
+
+const canviaTornJugador = (res, data) => {
+    const parsedData = querystring.parse(data);
+    console.log(`${parsedData.tauler}`);
+
+    torn = parsedData.torn;
+    partides.filter(partida => partida.id == parsedData.nomSala)[0].tauler = parsedData.tauler;
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ torn: torn }));
+};
+
+const finalitzaPartida = (res, data) => {
+    const parsedData = querystring.parse(data);
+    const partida = partides.filter(p => p.id == parsedData.nomSala)[0];
+    const partidaIdx = partides.findIndex(p => p.id == parsedData.nomSala);
+
+    try {
+        let usuari = '';
+
+        if (parsedData.jugador == 'n') {
+            usuari = partida.jugadorNegres;
+        } else {
+            usuari = partida.jugadorBlanques;
+        }
+
+        dadesBd.mongoClient.connect(dadesBd.url, (err, db) => {
+            if (err) throw err;
+
+            const cursor = db
+                .db(dadesBd.bd)
+                .collection(dadesBd.jugadorsCollection)
+                .update(
+                    {
+                        $or: [{ nom: usuari }, { email: usuari }],
+                    },
+                    { $push: { puntuacio: parsedData.puntuacio } }
+                );
+
+            db.close();
+        });
+
+        partides.splice(partidaIdx, 1);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ ok: 1 }));
     } catch (error) {
         res.writeHead(500, { 'Content-Type': 'text/plain' });
         return res.end('Error intern del servidor');

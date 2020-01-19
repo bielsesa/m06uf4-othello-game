@@ -2,9 +2,6 @@
 /* eslint-disable no-plusplus */
 
 $().ready(() => {
-    // Guardar el id del jugador aquí para enviarlo en el POST del AJAX
-    // Guardar el id de la sala
-
     const nomSala = prompt('Escriu el nom de la sala');
     let torn = 'n';
     let jugador = '';
@@ -208,6 +205,7 @@ $().ready(() => {
             }
         }
     };
+
     /* primera inicialització tauler  */
     regenerarTauler();
 
@@ -224,7 +222,6 @@ $().ready(() => {
                 complete: (result, status, xhr) => {
                     const data = JSON.parse(result.responseText);
                     torn = data.torn;
-                    console.log(`TAULER: ${JSON.stringify(data.tauler)}`);
 
                     // tauler = listToMatrix(data.tauler, 8);
                     tauler = data.tauler;
@@ -238,4 +235,19 @@ $().ready(() => {
             });
         }
     }, 500);
+
+    $('#bt-acabar').click(() => {
+        clearInterval(interval);
+        let puntuacio = 0;
+
+        tauler.forEach(fitxa => {
+            if (jugador == 'n' && fitxa == 2) {
+                puntuacio += 10;
+            } else if (jugador == 'b' && fitxa == 1) {
+                puntuacio += 10;
+            }
+        });
+
+        $.post('finalitzaPartida', JSON.stringify({ nomSala: nomSala, jugador: jugador, puntuacio: puntuacio }));
+    });
 });
