@@ -247,18 +247,11 @@ const iniciaPartida = (res, data) => {
     return res.end(JSON.stringify({ ok: 1, fitxes: 'n' }));
 };
 
-const moureFitxa = (res, postData) => {
-    const { jugadorId } = postData;
-    const { salaId } = postData;
-
-    res = { tipus: 'pasaTorn', jugadorId: jugadorId, salaId: salaId };
-};
-
 const tornJugador = (res, data) => {
     const partida = partides.filter(p => p.id == querystring.parse(data).nomSala)[0];
 
     if (partida != undefined) {
-        console.log(`TAULER: ${partida.tauler[0]}\nTYPE: ${typeof tauler}`);
+        // console.log(`TAULER: ${partida.tauler[0]}\nTYPE: ${typeof tauler}`);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ torn: torn, tauler: partida.tauler }));
     }
@@ -280,7 +273,7 @@ const canviaTornJugador = (res, data) => {
 const finalitzaPartida = (res, data) => {
     const parsedData = querystring.parse(data);
     const partida = partides.filter(p => p.id == parsedData.nomSala)[0];
-    const partidaIdx = partides.findIndex(p => p.id == parsedData.nomSala);
+    // const partidaIdx = partides.findIndex(p => p.id == parsedData.nomSala);
 
     try {
         let usuari = '';
@@ -294,20 +287,19 @@ const finalitzaPartida = (res, data) => {
         dadesBd.mongoClient.connect(dadesBd.url, (err, db) => {
             if (err) throw err;
 
-            const cursor = db
-                .db(dadesBd.bd)
+            db.db(dadesBd.bd)
                 .collection(dadesBd.jugadorsCollection)
                 .update(
                     {
                         $or: [{ nom: usuari }, { email: usuari }],
                     },
-                    { $push: { puntuacio: parsedData.puntuacio } }
+                    { $push: { puntuacions: parsedData.puntuacio } }
                 );
 
             db.close();
         });
 
-        partides.splice(partidaIdx, 1);
+        // partides.splice(partidaIdx, 1);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ ok: 1 }));
@@ -346,6 +338,8 @@ exports.loginUsuari = loginUsuari;
 exports.iniciaPartida = iniciaPartida;
 exports.tornJugador = tornJugador;
 exports.canviaTornJugador = canviaTornJugador;
+exports.finalitzaPartida = finalitzaPartida;
+exports.getTopPuntuacions = getTopPuntuacions;
 
 exports.index = index;
 exports.indexScript = indexScript;

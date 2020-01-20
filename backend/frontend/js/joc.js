@@ -223,9 +223,9 @@ $().ready(() => {
                     const data = JSON.parse(result.responseText);
                     torn = data.torn;
                     if (torn == 'n') {
-                        $('#torn-jugador').innerHTML('<b>Negres</b>');
-                    } else {
-                        $('#torn-jugador').innerHTML('<b>Blanques</b>');
+                        $('#torn-jugador').text('Negres');
+                    } else if (torn == 'b') {
+                        $('#torn-jugador').text('Blanques');
                     }
 
                     tauler = data.tauler;
@@ -252,6 +252,20 @@ $().ready(() => {
             }
         });
 
-        $.post('/finalitzaPartida', JSON.stringify({ nomSala: nomSala, jugador: jugador, puntuacio: puntuacio }));
+        $.ajax({
+            url: '/finalitzaPartida',
+            type: 'POST',
+            contentType: 'application/json',
+            data: {
+                nomSala: nomSala,
+                jugador: jugador,
+                puntuacio: puntuacio,
+            },
+            dataType: 'application/json',
+            complete: (result, status, xhr) => {
+                clearInterval(interval);
+                window.location.replace('/index');
+            },
+        });
     });
 });
