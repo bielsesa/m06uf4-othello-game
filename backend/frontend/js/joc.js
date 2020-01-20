@@ -222,8 +222,12 @@ $().ready(() => {
                 complete: (result, status, xhr) => {
                     const data = JSON.parse(result.responseText);
                     torn = data.torn;
+                    if (torn == 'n') {
+                        $('#torn-jugador').innerHTML('<b>Negres</b>');
+                    } else {
+                        $('#torn-jugador').innerHTML('<b>Blanques</b>');
+                    }
 
-                    // tauler = listToMatrix(data.tauler, 8);
                     tauler = data.tauler;
                     if (jugador == data.torn) {
                         $('.fitxes').removeClass('disabled');
@@ -248,6 +252,6 @@ $().ready(() => {
             }
         });
 
-        $.post('finalitzaPartida', JSON.stringify({ nomSala: nomSala, jugador: jugador, puntuacio: puntuacio }));
+        $.post('/finalitzaPartida', JSON.stringify({ nomSala: nomSala, jugador: jugador, puntuacio: puntuacio }));
     });
 });
