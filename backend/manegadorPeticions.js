@@ -316,17 +316,26 @@ const getTopPuntuacions = res => {
 
             const topPuntuacions = [];
 
-            db.db(dadesBd.bd)
+            const cursor = db
+                .db(dadesBd.bd)
                 .collection(dadesBd.jugadorsCollection)
-                .find()
-                .sort({ puntuacions: -1 })
-                .each(doc => {
-                    topPuntuacions.add({ usuari: doc.nom, puntuacio: doc.puntuacions[0] });
-                });
+                .find({ $query: {}, $orderby: { puntuacions: -1 } });
+            // .sort({ puntuacions: -1 });
+
+            cursor.each((err, doc) => {
+                console.log(`Doc: ${doc}`);
+                if (doc != null) {
+                    const puntParse = JSON.parse(doc.puntuacions);
+                    topPuntuacions.push({ usuari: doc.nom, puntuacio: Math.max(JSON.parse(doc.puntuacions)) });
+                    console.log(`Usuari: ${doc.nom}`);
+                    console.log(`Puntuacions max: ${JSON.parse(doc.puntuacions)}`);
+                    console.log(`Puntuacio max: ${Math.max(parseInt(puntParse))}`);
+                }
+            });
 
             db.close();
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            return res.end(JSON.stringify(topPuntuacions));
+            return res.end(JSON.stringify({ top: topPuntuacions }));
         });
     } catch (error) {
         res.writeHead(500, { 'Content-Type': 'text/plain' });

@@ -9,12 +9,15 @@ $().ready(() => {
         $('#login').addClass('disabled');
     }
 
-    $.get('/getTopPuntuacions', data => {
-        const parsedData = JSON.parse(data);
-        const taulaPunts = document.getElementById('puntuacions');
+    $.ajax({
+        url: '/getTopPuntuacions',
+        type: 'GET',
+        dataType: 'application/json',
+        complete: (result, status, xhr) => {
+            const parsedData = JSON.parse(result.responseText);
+            const taulaPunts = document.getElementById('puntuacions');
 
-        console.log(data);
-
-        // parsedData.array.forEach(element => {});
+            console.log(JSON.stringify(parsedData.top));
+        },
     });
 });
