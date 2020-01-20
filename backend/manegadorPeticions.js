@@ -321,10 +321,12 @@ const getTopPuntuacions = res => {
                 .find()
                 .sort({ puntuacions: -1 })
                 .each(doc => {
-                    topPuntuacions.add(doc.puntuacions);
+                    topPuntuacions.add({ usuari: doc.nom, puntuacio: doc.puntuacions[0] });
                 });
 
             db.close();
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify(topPuntuacions));
         });
     } catch (error) {
         res.writeHead(500, { 'Content-Type': 'text/plain' });

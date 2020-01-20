@@ -67,7 +67,3 @@ td:nth-child(odd) {
   border: solid 1px grey;
   border-radius: 20px;
 }
-
-#torn-jugador {
-  font-weight: bold;
-}

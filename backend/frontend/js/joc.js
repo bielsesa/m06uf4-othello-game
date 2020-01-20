@@ -5,6 +5,7 @@ $().ready(() => {
     const nomSala = prompt('Escriu el nom de la sala');
     let torn = 'n';
     let jugador = '';
+    // let puntuacio = 0;
     let isPaused = false;
     let tauler = [
         [-1, -1, -1, -1, -1, -1, -1, -1],
