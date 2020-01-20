@@ -323,13 +323,17 @@ const getTopPuntuacions = res => {
             // .sort({ puntuacions: -1 });
 
             cursor.each((err, doc) => {
-                console.log(`Doc: ${doc}`);
+                console.log(`Doc: ${JSON.stringify(doc)}`);
                 if (doc != null) {
-                    const puntParse = JSON.parse(doc.puntuacions);
-                    topPuntuacions.push({ usuari: doc.nom, puntuacio: Math.max(JSON.parse(doc.puntuacions)) });
-                    console.log(`Usuari: ${doc.nom}`);
-                    console.log(`Puntuacions max: ${JSON.parse(doc.puntuacions)}`);
-                    console.log(`Puntuacio max: ${Math.max(parseInt(puntParse))}`);
+                    // const puntsParse = JSON.parse(doc.puntuacions);
+                    // const puntsInt = [];
+                    // puntsParse.forEach(punts => {
+                    //     puntsInt.push(parseInt(punts));
+                    // });
+                    // topPuntuacions.push({ usuari: doc.nom, puntuacio: Math.max(JSON.parse(doc.puntuacions)) });
+                    // console.log(`Usuari: ${doc.nom}`);
+                    // console.log(`Puntuacions max: ${JSON.parse(doc.puntuacions)}`);
+                    // console.log(`Puntuacio max: ${Math.max(parseInt(puntsInt))}`);
                 }
             });
 
