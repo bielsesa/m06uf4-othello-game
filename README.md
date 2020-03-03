@@ -1,4 +1,4 @@
-# PLAY OTHELLO ON THE WEB!
+# PLAY OTHELLO ON THE WEB! [WIP]
  
 <b>[CAT]</b><br>
 Pàgina web per jugar a l'Othello (també conegut com Reversi)!<br>
